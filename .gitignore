@@ -1,0 +1,5 @@
+ircserv
+.vscode/
+a.out
+*.dSYM/
+ircserv.dSYM
