@@ -3,29 +3,46 @@
 :star: Functions to use:
 
 Everything in C++ 98,  
-`socket`,  
+`int socket(int domain, int type, int protocol)` - Создания нового сокета. Используем socket(AF_INET, SOCK_STREAM, 0) для сокета на IPv4/TCP.        
+
+`int bind(int fd, struct sockaddr *local_addr, socklen_t addr_length)` - подключает сокет к порту.   
+
+`int listen(int fd, int backlog_queue_size)` - ждет входящие сообщения по fd сокета.          
+
+`int accept(int fd, struct sockaddr *remote_host, socklen_t addr_length)` -  создает и возвращает новый сокет для общения с клиентом и записывает данные клиента в структуру remote_host.   
+
+`int connect(int fd, struct sockaddr *remote_host, socklen_t addr_length)` - подключает сокет к хосту.  
+
 `setsockopt`,  
-`getsockname`,  
+
+`int getsockname(int fd, struct sockaddr *restrict addr, socklen_t *restrict addrlen)` - записывает адресс к которому подключен сокет fd в структуру addr.   
+
 `getprotobyname`,  
+
 `gethostbyname`,  
+
 `getaddrinfo`,  
+
 `freeaddrinfo`,  
-`bind`,  
-`connect`,  
-`listen`,  
-`accept`,  
-`htons`,   
-`htonl`,  
-`ntohs`,  
-`ntohl`,  
+
+`htons`, `htonl`, `ntohs`, `ntohl` - функции для конвертации данных из узлового порядка в сетевой и обратно (нужны для записи данных в структуру sockaddr).   
+
 `inet_addr`,  
+
 `inet_ntoa`,  
-`send`,  
-`recv`,  
+
+`int send(int fd, void *buffer, size_t n, int flags)` - отправить сообщение (аналог write).    
+
+`int recv(int fd, void *buffer, size_t n, int flags)` - получить сообщение (аналог read).    
+
 `signal`,  
+
 `lseek`,  
-`fstat`,  
-`fcntl` (only `fcntl(fd, F_SETFL, O_NONBLOCK)`),  
+
+`fstat`, 
+
+`fcntl` (only `fcntl(fd, F_SETFL, O_NONBLOCK)`) - нужен только для выставления флага NONBLOCK для сокета.     
+
 `poll` (or equivalent like `select`, `kqueue`, `epoll`) 
 
 :star: It is forbidden to `read`/`recv` or `write`/`send` in any FD without going through a `poll` (or equivalent)
