@@ -60,7 +60,7 @@ Everything in C++ 98,
 • to have some operator’s specific actions/commands
 
 :star: Documentation:  
-https://tools.ietf.org/html/rfc1459  (на русском - https://ircnet.ru/rfc1459.html)  
+Основная спецификация от 1993 года: https://tools.ietf.org/html/rfc1459  (*на кривом русском - https://ircnet.ru/rfc1459.html*)  
 https://tools.ietf.org/html/rfc2810  
 https://tools.ietf.org/html/rfc2811  
 https://tools.ietf.org/html/rfc2812  
@@ -74,6 +74,7 @@ https://tools.ietf.org/html/rfc7194
 - https://www.bogotobogo.com/cplusplus/sockets_server_client.php
 
 *irc:*
+- https://ru.bmstu.wiki/IRC_(Internet_Relay_Chat) 
 - https://www.irchelp.org/protocol/rfc/
 - https://ru.wikipedia.org/wiki/Список_IRC-команд
-- 
+
