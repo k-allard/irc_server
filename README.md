@@ -59,7 +59,21 @@ Everything in C++ 98,
 
 • to have some operator’s specific actions/commands
 
-:star: Useful links aggregation:
+:star: Documentation:  
+https://tools.ietf.org/html/rfc1459  (на русском - https://ircnet.ru/rfc1459.html)  
+https://tools.ietf.org/html/rfc2810  
+https://tools.ietf.org/html/rfc2811  
+https://tools.ietf.org/html/rfc2812  
+https://tools.ietf.org/html/rfc2813  
+https://tools.ietf.org/html/rfc7194  
+
+:star: Useful links:
+
+*socket programming:*
+- https://www.geeksforgeeks.org/socket-programming-cc/  
+- https://www.bogotobogo.com/cplusplus/sockets_server_client.php
+
+*irc:*
 - https://www.irchelp.org/protocol/rfc/
 - https://ru.wikipedia.org/wiki/Список_IRC-команд
 - 
