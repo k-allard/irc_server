@@ -77,3 +77,5 @@ https://tools.ietf.org/html/rfc7194
 - https://www.irchelp.org/protocol/rfc/
 - https://ru.wikipedia.org/wiki/Список_IRC-команд
 - 
+
+:star: [Checklist](https://github.com/secondfry/school21-checklists/blob/master/ng_5_ft_irc.pdf "Возможно старый") 
