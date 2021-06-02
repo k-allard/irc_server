@@ -95,6 +95,8 @@ https://tools.ietf.org/html/rfc7194
 - https://www.irchelp.org/protocol/rfc/
 - https://ru.wikipedia.org/wiki/Список_IRC-команд
 
-- 
+*irc client:*
+- git clone git://git.suckless.org/sic 
+- man: http://manpages.ubuntu.com/manpages/bionic/man1/sic.1.html 
 
 :star: [Checklist](https://github.com/secondfry/school21-checklists/blob/master/ng_5_ft_irc.pdf "Возможно старый") 
