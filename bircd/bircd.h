@@ -31,7 +31,7 @@ typedef struct	s_env
   int		maxfd;
   int		max;
   int		r;
-  fd_set	fd_read;
+  fd_set	fd_read;  
   fd_set	fd_write;
 }		t_env;
 

@@ -4,5 +4,8 @@
 
 void	do_select(t_env *e)
 {
-  e->r = select(e->max + 1, &e->fd_read, &e->fd_write, NULL, NULL);
+  e->r = select(FD_SETSIZE, &e->fd_read, &e->fd_write, NULL, NULL);
+  if (e->r == -1)
+    std::cout << "Select() ERROR\n"; 
+
 }
