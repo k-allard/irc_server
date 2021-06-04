@@ -74,7 +74,6 @@ int main(int argc, char **argv) {
 		else    //the set is empty
 			mx = server_fd;
 
-		std::cout << "\n+++++++ Waiting ++++++++\n\n";
 		// select - Ждём события в одном из сокетов
 		int total_fds = 0; 		// total_fds - суммарное кол-во фд, сработавших в селекте
 		if ((total_fds = select(mx + 1, &readset, &writeset, NULL, NULL)) == -1) {
@@ -106,16 +105,18 @@ int main(int argc, char **argv) {
                     clients_fd.erase(*it);
                     continue;
 				}
+
                 // Отправим данные от клиента парсеру
                 // parser(*it, buf, bytes_read, 0); // (фд клиента, буфер с сообщением, размер сообщения)
             }
             if (FD_ISSET(*it, &writeset)) {
+				std::string client_buf;
+				client_buf.clear();
 				// Посмотрим буфер этого клиента, если есть, что ему писать, то сливаем ему буфер, буфер очищаем
-				// std::string client_buf;
-				// send(*it, client_buf.c_str(), client_buf.length(), 0);
+				if (!client_buf.empty())
+					send(*it, client_buf.c_str(), client_buf.length(), 0);
 			}
         }
-		
-		return 0;
 	}
+	return 0;
 }
