@@ -67,8 +67,12 @@ int main(int argc, char **argv) {
 		for(std::set<int>::iterator it = clients_fd.begin(); it != clients_fd.end(); it++)
             FD_SET(*it, &writeset);
 
+		int mx = 0;
 		// mx+1 - число, на единицу большее максимального файлового дескриптора в любом из наборов (1 аргумент selecta)
-		int mx = std::max(server_fd, *max_element(clients_fd.begin(), clients_fd.end()));
+		if (!clients_fd.empty())
+    		mx = std::max(server_fd, *clients_fd.rbegin());
+		else    //the set is empty
+			mx = server_fd;
 
 		std::cout << "\n+++++++ Waiting ++++++++\n\n";
 		// select - Ждём события в одном из сокетов
