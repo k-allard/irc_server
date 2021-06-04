@@ -4,5 +4,6 @@ a.out
 *.dSYM/
 ircserv.dSYM
 .DS_Store
+bircd
 client
 server

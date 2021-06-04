@@ -1,6 +1,6 @@
 NAME = ircserv
 
-SRCS = main.cpp
+SRCS = sources/*.cpp sources/commands/*.cpp
 
 OBJS = $(SRCS:.cpp=.o)
 
@@ -25,7 +25,7 @@ fclean: clean
 re: fclean all
 
 test: re
-	@./my_containers
+	@./ircserv 6667 123
 
 %.o: %.cpp
 	@clang++ $(FLAGS) -c $< -o $@
