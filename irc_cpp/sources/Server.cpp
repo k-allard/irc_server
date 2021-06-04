@@ -1,9 +1,9 @@
 #include "../includes/Server.hpp"
-#include "../includes/Client.hpp"
 
 Server::Server(int port, std::string pass) : _port(port), _pass(pass), _server_fd(0) {
 	initServer();
 	_clients_fd.clear();
+	_clients.clear();
 };
 
 Server::~Server() { }
@@ -58,8 +58,14 @@ void Server::checkFds() {
 		// Создаем новый инстанс класса клиент, передаем ему его фд и адрес
 		Client client(new_socket, address);
 		// добавить его в список (мапу) наших клиентов, поставив фд в каестве ключа
+		_clients.insert( std::pair< int,Client* >(new_socket, &client));
 		std::cout << "\n+++++++ New client joined! ++++++++\n\n";
-
+		std::cout << "\n+++++++ Our clients' fds: ++++++++\n";
+		std::map<int,Client*>::iterator it;
+		for (it=_clients.begin(); it!=_clients.end(); ++it)
+    		std::cout << it->first << "||| "; 
+		std::cout << "\n";
+		std::cout.flush();
 	}
 	for (std::set<int>::iterator it = _clients_fd.begin(); it != _clients_fd.end(); it++) {
 		if (FD_ISSET(*it, &_readset)) {
@@ -68,6 +74,7 @@ void Server::checkFds() {
 				// Соединение разорвано, удаляем сокет из сета
 				close(*it);
 				_clients_fd.erase(*it);
+				//удалить из мапы "клиенты" 
 				std::cout << "\n+++++++ Сlient gone away! ++++++++\n\n";
 				break ;
 			}
