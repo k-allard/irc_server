@@ -1,4 +1,5 @@
 #include "../includes/Server.hpp"
+#include "../includes/Client.hpp"
 
 Server::Server(int port, std::string pass) : _port(port), _pass(pass), _server_fd(0) {
 	initServer();
@@ -54,8 +55,8 @@ void Server::checkFds() {
 		fcntl(new_socket, F_SETFL, O_NONBLOCK);
 		// Добавляем подключившегося клиента в список наших клиентов
 		_clients_fd.insert(new_socket);
-		// создать новый инстанс класса клиент
-		// присвоить ему его айпи и сайз
+		// Создаем новый инстанс класса клиент, передаем ему его фд и адрес
+		Client client(new_socket, address);
 		// добавить его в список (мапу) наших клиентов, поставив фд в каестве ключа
 		std::cout << "\n+++++++ New client joined! ++++++++\n\n";
 

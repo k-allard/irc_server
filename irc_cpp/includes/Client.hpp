@@ -4,8 +4,10 @@
 class Client
 {
 private:
-	/* data */
+	int					_fd;
+	struct sockaddr_in	_address;
+
 public:
-	Client(/* args */);
+	Client(int fd, struct sockaddr_in address);
 	~Client();
 };
