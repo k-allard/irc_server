@@ -1,4 +1,4 @@
-#include "main.hpp"
+#include "header.hpp"
 #include "Server.hpp"
 
 int main(int argc, char **argv) {
@@ -7,38 +7,41 @@ int main(int argc, char **argv) {
 		exit(1); 
 	}
 
-	int					PORT			= std::atoi(argv[1]);
-	std::string			PASS(argv[2]);
-	int 				server_fd		= 0;
+
+	// int					PORT			= std::atoi(argv[1]);
+	// std::string			PASS(argv[2]);
+	// int 				server_fd		= 0;
 	struct sockaddr_in	address;		// для хранения адресов ipv4
 	socklen_t			size			= sizeof(address);
 	char				buf[1024]		= {0}; // буфер для чтения из сокетов
 	int					bytes_read		= 0;
 
+	Server server(std::atoi(argv[1]), argv[2]);
+
 	// socket - Создать новый поточный Интернет-сокет (TCP/IP) и вернуть его файловый дескриптор
-	if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0) { 
-		perror("socket");
-		exit(2);
-	}
-	fcntl(server_fd, F_SETFL, O_NONBLOCK);  // устанавливается неблокирующий доступ к фд
+	// if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0) { 
+	// 	perror("socket");
+	// 	exit(2);
+	// }
+	// fcntl(server_fd, F_SETFL, O_NONBLOCK);  // устанавливается неблокирующий доступ к фд
 
-	//Инициализация структуры с адресом
-	memset((char *)&address, 0, sizeof(address)); 
-	address.sin_family = AF_INET; 
-	address.sin_addr.s_addr = htonl(INADDR_ANY);
-	address.sin_port = htons(PORT);
+	// //Инициализация структуры с адресом
+	// memset((char *)&address, 0, sizeof(address)); 
+	// address.sin_family = AF_INET; 
+	// address.sin_addr.s_addr = htonl(INADDR_ANY);
+	// address.sin_port = htons(PORT);
 
-	// bind - Связать сокет с IP-адресом и портом
-	if (bind(server_fd,(struct sockaddr *)&address,sizeof(address)) < 0) { 
-		perror("bind");
-		exit(3);
-	}
+	// // bind - Связать сокет с IP-адресом и портом
+	// if (bind(server_fd,(struct sockaddr *)&address,sizeof(address)) < 0) { 
+	// 	perror("bind");
+	// 	exit(3);
+	// }
 
-	//listen - Объявить о желании принимать соединения. Слушает порт и ждет когда будет установлено соединение
-	if (listen(server_fd, 10) < 0) { // 10 - максимальное количество соединений, которые могут быть поставлены в очередь
-		perror("listen");
-		exit(4);
-	}
+	// //listen - Объявить о желании принимать соединения. Слушает порт и ждет когда будет установлено соединение
+	// if (listen(server_fd, 10) < 0) { // 10 - максимальное количество соединений, которые могут быть поставлены в очередь
+	// 	perror("listen");
+	// 	exit(4);
+	// }
 
 	//сет с клиентами, подключенными к нашему серверу
 	std::set<int> clients_fd;
