@@ -1,11 +1,5 @@
-#include <iostream>
-#include <fcntl.h>
-#include <sys/socket.h> 
-#include <netinet/in.h> //для sockaddr_in
-#include <unistd.h> 
-#include <cstdlib> // for atoi
-#include <set> // for std::set
-#include <algorithm> // for std::max
+#include "main.hpp"
+#include "Server.hpp"
 
 int main(int argc, char **argv) {
 	if (argc != 3) {
