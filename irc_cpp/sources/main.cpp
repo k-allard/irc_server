@@ -53,14 +53,15 @@ int main(int argc, char **argv) {
 	int new_socket = 0;
 
 	while(1) {
-		// Заполняем сет сокетов на мониторинг готовности к чтению
+		// readset - сет, в котором после селекта останутся фд клиентов, которые что-то написали серверу
+		// ( то есть нам надо из них прочитать)
 		fd_set readset;
 		FD_ZERO(&readset);
 		FD_SET(server_fd, &readset);
 		for(std::set<int>::iterator it = clients_fd.begin(); it != clients_fd.end(); it++)
 			FD_SET(*it, &readset);
 
-		// Заполняем сет сокетов на мониторинг готовности к записи
+		// writeset - сет, в котором после селекта останутся фд клиентов, которым нам можно писать
 		fd_set writeset;
 		FD_ZERO(&writeset);
 		FD_SET(server_fd, &writeset);
@@ -104,6 +105,7 @@ int main(int argc, char **argv) {
 					// Соединение разорвано, удаляем сокет из сета
 					close(*it);
 					clients_fd.erase(*it);
+					std::cout << "\n+++++++ Сlient gone away! ++++++++\n\n";
 					continue;
 				}
 
