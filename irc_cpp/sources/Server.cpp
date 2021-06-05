@@ -89,11 +89,9 @@ void Server::checkFds() {
 			// parser(*it, buf, bytes_read, 0); // (фд клиента, буфер с сообщением, размер сообщения)
 		}
 		if (FD_ISSET(*it, &_writeset)) {
-			std::string client_buf;
-			client_buf.clear();
 			// Посмотрим буфер этого клиента, если есть, что ему писать, то отправим это ему, буфер очистим
-			if (!client_buf.empty())
-				send(*it, client_buf.c_str(), client_buf.length(), 0);
+			// if ((_clients[*it])->_buf[0])
+			// 	send(*it, (_clients[*it])->_buf, 1024, 0);
 		}
 	}
 }
