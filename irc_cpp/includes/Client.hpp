@@ -30,6 +30,7 @@ public:
 	bool		isReg() {return this->_isreg;};
 
 	// Getters
+	int					getFd() {return this->_fd;};
 	const std::string	&getNick() {return this->_nick;};
 	const std::string	&getUser() {return this->_user;};
 	const std::string	&getHost() {return this->_host;};

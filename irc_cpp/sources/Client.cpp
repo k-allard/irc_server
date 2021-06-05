@@ -2,6 +2,11 @@
 
 Client::Client(int fd, struct sockaddr_in address) : _fd(fd), _address(address)
 {
+	this->_nick = "";
+	this->_user = "";
+	this->_host = "";
+	this->_server = "";
+	this->_real = "";
 	this->_isreg = false;
 }
 

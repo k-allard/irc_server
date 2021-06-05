@@ -1,6 +1,7 @@
 #pragma once
 #include "header.hpp"
 #include "../includes/Client.hpp"
+#include "../includes/Cmds.hpp"
 
 class Server
 {
@@ -31,6 +32,7 @@ private:
 	//  f o r _ d e b u g //
 	//********************//
 	void	printClients();
+	void	temParser(int fd, char *buf, int size);
 
 };
 
