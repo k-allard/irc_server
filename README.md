@@ -7,8 +7,15 @@
 2. :hammer: Работаешь в своей ветке, делаешь коммиты :hammer:
 3. Закончив фичу, тестируешься локально:  
 `git checkout main`, `git pull`, `git merge <твоя_ветка>`, проверяешь на работоспособность
-4. если все ОК :white_check_mark:, то `git push` (изменения отправляются вовне)
-5. если КО, то оставаясь в мейн ветке, смотрим лог (`git log`) и откатываемся на состояние до слияния со своей веткой (`git checkout a7272abc717`(id коммита))
+4. :white_check_mark: если все ОК, то `git push` (изменения отправляются вовне), возвращаемся в свою ветку `git checkout <твоя_ветка>` и пушишь ее `git push`
+
+:x: Если на 3 шаге что-то пошло не так :dizzy_face:, то можно откатиться на состояние до merge: `git checkout main`, `git fetch origin`, `git reset --hard origin/main` ИЛИ поправить код в локальном main. Убедиться, что все ок.
+Сделать `git commit -m "Fix ..."`
+Вернуться в свою ветку: `git checkout <твоя_ветка>`
+Забрать fix-правки: `git merge main`
+Снова перейти в main и попробовать все повторить заново: `git checkout main` `git fetch origin` `git reset --hard origin/main`
+Смержиться снова: `git merge <твоя_ветка>`
+Если все стало ок, то шаг 4
 _________________________
 :star: Functions to use:
 
