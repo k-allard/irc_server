@@ -36,6 +36,15 @@ void Server::doSelect() {
 	}
 }
 
+//для дебага
+void Server::printClients() {
+std::cout << "Our clients' fds: ";
+		std::map<int, Client*>::iterator it;
+		for (it = _clients.begin(); it != _clients.end(); ++it)
+    		std::cout << it->first << " | ";
+		std::cout << std::endl;
+}
+
 void Server::checkFds() {
 	int					bytes_read		= 0;
 	struct sockaddr_in	address;		// структура для хранения адресов ipv4
@@ -60,12 +69,7 @@ void Server::checkFds() {
 		// добавить его в список (мапу) наших клиентов, поставив фд в каестве ключа
 		_clients.insert( std::pair< int,Client* >(new_socket, &client));
 		std::cout << "\n+++++++ New client joined! ++++++++\n\n";
-		std::cout << "\n+++++++ Our clients' fds: ++++++++\n";
-		std::map<int,Client*>::iterator it;
-		for (it=_clients.begin(); it!=_clients.end(); ++it)
-    		std::cout << it->first << "||| "; 
-		std::cout << "\n";
-		std::cout.flush();
+		printClients();
 	}
 	for (std::set<int>::iterator it = _clients_fd.begin(); it != _clients_fd.end(); it++) {
 		if (FD_ISSET(*it, &_readset)) {
@@ -73,9 +77,10 @@ void Server::checkFds() {
 			if ((bytes_read = recv(*it, _buf, 1024, 0)) <= 0) {
 				// Соединение разорвано, удаляем сокет из сета
 				close(*it);
+				_clients.erase(*it);
 				_clients_fd.erase(*it);
-				//удалить из мапы "клиенты" 
 				std::cout << "\n+++++++ Сlient gone away! ++++++++\n\n";
+				printClients();
 				break ;
 			}
 			std::string clientWrote(_buf);
