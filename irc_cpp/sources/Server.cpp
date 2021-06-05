@@ -84,7 +84,7 @@ void Server::checkFds() {
 				break ;
 			}
 			std::string clientWrote(_buf);
-			std::cout << "Client " << *it << " wrote: " << clientWrote; 
+			std::cout << "Client " << *it << " wrote: " << clientWrote << std::endl;
 			// Отправим данные от клиента парсеру
 			// parser(*it, buf, bytes_read, 0); // (фд клиента, буфер с сообщением, размер сообщения)
 		}
