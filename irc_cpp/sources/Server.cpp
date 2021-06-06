@@ -6,7 +6,12 @@ Server::Server(int port, std::string pass) : _port(port), _pass(pass), _server_f
 	_clients.clear();
 };
 
-Server::~Server() { }
+Server::~Server() {
+	std::map<int, Client*>::iterator it;
+	for (it = _clients.begin(); it != _clients.end(); ++it)
+		delete it->second;
+	_clients.clear();
+}
 
 void Server::initFds() {
 
@@ -65,9 +70,9 @@ void Server::checkFds() {
 		// Добавляем подключившегося клиента в список наших клиентов
 		_clients_fd.insert(new_socket);
 		// Создаем новый инстанс класса клиент, передаем ему его фд и адрес
-		Client client(new_socket, address);
+		Client* client = new Client(new_socket, address);
 		// добавить его в список (мапу) наших клиентов, поставив фд в каестве ключа
-		_clients.insert( std::pair< int,Client* >(new_socket, &client));
+		_clients.insert( std::pair< int,Client* >(new_socket, client));
 		std::cout << "\n+++++++ New client joined! ++++++++\n\n";
 		printClients();
 	}
@@ -90,8 +95,10 @@ void Server::checkFds() {
 		}
 		if (FD_ISSET(*it, &_writeset)) {
 			// Посмотрим буфер этого клиента, если есть, что ему писать, то отправим это ему, буфер очистим
-			// if ((_clients[*it])->_buf[0])
-			// 	send(*it, (_clients[*it])->_buf, 1024, 0);
+			if (_clients.at(*it)->_buf[0] != 0) {
+				send(*it, _clients.at(*it)->_buf, 10, 0);
+				_clients.at(*it)->_buf[0] = 0;
+			}
 		}
 	}
 }
