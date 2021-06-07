@@ -65,8 +65,10 @@ void Server::temParser(int fd, char *buf, int size)
 	if(com.compare(0, 4, "NICK") == 0)
 	{
 		std::cout << "NICK cmd" << std::endl;
-		std::string nick = com.substr(5, com.npos);
-		if (cmds.NICKCmd(fd, com.substr(5, com.npos)) == -1)
+		std::string nick = "";
+		if(com.size() > 4)
+			nick = com.substr(5, com.npos);
+		if (cmds.NICKCmd(fd, nick) == -1)
 			perror("nick err");
 		return ;
 	}
@@ -129,8 +131,8 @@ void Server::checkFds() {
 		if (FD_ISSET(*it, &_writeset)) {
 			// Посмотрим буфер этого клиента, если есть, что ему писать, то отправим это ему, буфер очистим
 			if (_clients.at(*it)->_buf[0] != 0) {
-				send(*it, _clients.at(*it)->_buf, 10, 0);
-				_clients.at(*it)->_buf[0] = 0;
+				send(*it, _clients.at(*it)->_buf, strlen(_clients.at(*it)->_buf), 0);
+				bzero(_clients.at(*it)->_buf, 1024);
 			}
 		}
 	}
