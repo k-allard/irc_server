@@ -66,7 +66,7 @@ void Server::temParser(int fd, char *buf, int size)
 	{
 		std::cout << "NICK cmd" << std::endl;
 		std::string nick = com.substr(5, com.npos);
-		if (cmds.nickCmd(fd, com.substr(5, com.npos)) == -1)
+		if (cmds.NICKCmd(fd, com.substr(5, com.npos)) == -1)
 			perror("nick err");
 		return ;
 	}
