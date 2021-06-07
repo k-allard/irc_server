@@ -1,17 +1,22 @@
 #pragma once
 #include "header.hpp"
+#include "Client.hpp"
+#include "Codes.hpp"
 
 class Cmds
 {
 private:
 	std::map<int, Client*>	*_clients;
-	
+
+	Client *findClientNick(std::string nick); // Ишет инстанс клиента по нику
+	int		writeToBuf(int fd, std::string mess); //Записать сообщение в буфер клиента для отправки
+	int		setReply(int fd, int code, std::string mess, std::string args); // создает сообщение по коду ошибки и отправляет его в writeToBuf
+
 public:
 	Cmds(std::map<int, Client*> *clients);
 	~Cmds();
 
 	Client *findClient(int fd); // Ишет инстанс клиента по fd
-	int		setMessage(int fd, std::string message); //Записать сообщение в буфер клиента для отправки
 
 	int		NICKCmd(int fd, std::string args);
 	int		PASSCmd(int fd, std::string args);
