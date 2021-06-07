@@ -1,7 +1,7 @@
 #pragma once
 #include "header.hpp"
-#include "../includes/Client.hpp"
-#include "../includes/Cmds.hpp"
+#include "Client.hpp"
+#include "Cmds.hpp"
 
 class Server
 {
@@ -15,12 +15,12 @@ private:
 	fd_set					_readset;		// сет, в котором после селекта останутся фд клиентов, которые что-то написали серверу (то есть нам надо из них прочитать)
 	fd_set					_writeset;		// сет, в котором после селекта останутся фд клиентов, которым нам можно писать
 	int						_mx;			// максимальный номер фд среди всех
-	std::map<int, Client*>	_clients;		// мапа клиентов с ключом - номером сокета и значением - ссылкой на инстанс клиента
 
 public:
 	Server(int port, std::string pass);
 	~Server();
 	void	mainLoop();
+	std::map<int, Client*>	_clients;		// мапа клиентов с ключом - номером сокета и значением - ссылкой на инстанс клиента
 
 private:
 	void	initServer();

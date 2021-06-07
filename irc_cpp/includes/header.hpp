@@ -1,5 +1,7 @@
 #pragma once
 
+
+
 #include <iostream>
 #include <fcntl.h>
 #include <sys/socket.h> 
@@ -14,3 +16,13 @@
 // Для Linux
 #include <cstdio>
 #include <cstring>
+
+class Parser;
+class Client;
+class Server;
+
+#include "Parser.hpp"
+#include "Client.hpp"
+#include "Server.hpp"
+
+// std::string G_CMDS[12] = {"NICK", "PASS", "JOIN", "QUIT", "PART", "MOTD", "PRIVMSG", "MODE", "KICK", "LUSER", "USER", "USERS" };
