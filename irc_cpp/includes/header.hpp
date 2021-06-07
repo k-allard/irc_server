@@ -10,3 +10,7 @@
 #include <map>          // for std::map
 #include <algorithm>    // for std::max
 #include <utility>
+
+// Для Linux
+#include <cstdio>
+#include <cstring>
