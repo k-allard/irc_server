@@ -32,7 +32,7 @@ private:
 	//  f o r _ d e b u g //
 	//********************//
 	void	printClients();
-	// void	temParser(int fd, char *buf, int size);
+	void	temParser(int fd, char *buf, int size);
 
 };
 

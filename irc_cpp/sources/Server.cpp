@@ -126,16 +126,11 @@ void Server::checkFds() {
 			std::cout << "Client " << *it << " wrote: " << clientWrote << std::endl;
 			// Отправим данные от клиента парсеру
 			// parser(*it, buf, bytes_read, 0); // (фд клиента, буфер с сообщением, размер сообщения)
-<<<<<<< HEAD
-			Parser *parser = new Parser(*this);
-			parser->do_parsing(*it, _buf, bytes_read);
-=======
 
 			Parser *parser = new Parser(*this);
 			parser->do_parsing(*it, _buf, bytes_read);
 
 			//temParser(*it, _buf, bytes_read);
->>>>>>> mmaida
 		}
 		if (FD_ISSET(*it, &_writeset)) {
 			// Посмотрим буфер этого клиента, если есть, что ему писать, то отправим это ему, буфер очистим
