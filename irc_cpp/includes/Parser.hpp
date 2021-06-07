@@ -1,13 +1,14 @@
 #pragma once
 #include "header.hpp"
+#include "Cmds.hpp"
 
-std::string G_CMDS[12] = {"NICK", "PASS", "JOIN", "QUIT", "PART", "MOTD", "PRIVMSG", "MODE", "KICK", "LUSER", "USER", "USERS" };
 
 class Parser
 {
 private:
-	/* data */
+	Server &_server;
 public:
-	Parser(/* args */);
+	Parser(Server &server);
 	~Parser();
+	void do_parsing(int fd, char *buf, int size);
 };
