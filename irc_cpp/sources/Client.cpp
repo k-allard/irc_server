@@ -8,8 +8,8 @@ Client::Client(int fd, struct sockaddr_in address) : _fd(fd), _address(address)
 	this->_server = "";
 	this->_real = "";
 	this->_isreg = false;
-	this->_buf = new char[1024];
-    bzero(this->_buf, 1024);
+	this->_buf = new char[512];
+    bzero(this->_buf, 512);
 }
 
 Client::Client(const Client &src)

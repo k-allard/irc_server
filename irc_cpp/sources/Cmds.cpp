@@ -26,10 +26,10 @@ int		Cmds::writeToBuf(int fd, std::string mess)
 		perror("clien not found");
 		return -1;
 	}
-	bzero(client->_buf, 1024);
+	bzero(client->_buf, 512);
 	mess += "\r\n";
 	strcpy(client->_buf, mess.c_str());
-	std::cout << "MSG: " << client->_buf << std::endl;
+	std::cout << "Rpl: " << client->_buf << std::endl;
 	return 1;
 }
 
@@ -47,7 +47,7 @@ int		Cmds::setReply(int fd, int code, std::string mess, std::string args)
 		return -1;
 	}
 	// Добавить префикс
-	res = std::to_string(code);
+	res = std::to_string(code); // С++11
 	if(!client->getNick().empty())
 		res += " " + client->getNick();
 	else
@@ -56,6 +56,18 @@ int		Cmds::setReply(int fd, int code, std::string mess, std::string args)
 		res += " " + args;
 	res += " " + mess;
 	writeToBuf(fd, res);
+	return 0;
+}
+
+int		Cmds::checkNick(std::string nick)
+{
+	if(nick.size() > 9)
+		return 0;
+	for(int i = 0; i < nick.size(); i++)
+	{
+		if(nick[i] < 33 || nick[i] > 126)
+			return 0;
+	}
 	return 1;
 }
 
@@ -68,11 +80,10 @@ int		Cmds::NICKCmd(int fd, std::string args)
 		return -1;
 	}
 	if(args.empty())
-	{
-		setReply(fd, ERR_NONICKNAMEGIVEN, ERR_NONICKNAMEGIVEN_MSG, "");
-		return 0;
-	}
-	// Проверить валидность ника
+		return setReply(fd, ERR_NONICKNAMEGIVEN, ERR_NONICKNAMEGIVEN_MSG, "");
+	if(checkNick(args) == 0)
+		return setReply(fd, ERR_ERRONEUSNICKNAME, ERR_ERRONEUSNICKNAME_MSG, args);
+	// проверить есть ли такой ник
 	client->setNick(args);
 	return 0;
 }

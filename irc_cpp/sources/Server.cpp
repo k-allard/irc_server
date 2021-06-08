@@ -88,7 +88,7 @@ void Server::checkFds() {
 	int					bytes_read		= 0;
 	struct sockaddr_in	address;		// структура для хранения адресов ipv4
 
-	bzero(_buf, 1024);
+	bzero(_buf, 512);
 
 	int new_socket = 0;
 	// FD_ISSET - Определяем тип события и выполняем соответствующие действия:
@@ -113,7 +113,7 @@ void Server::checkFds() {
 	for (std::set<int>::iterator it = _clients_fd.begin(); it != _clients_fd.end(); it++) {
 		if (FD_ISSET(*it, &_readset)) {
 			// Поступили данные от клиента, читаем их
-			if ((bytes_read = recv(*it, _buf, 1024, 0)) <= 0) {
+			if ((bytes_read = recv(*it, _buf, 512, 0)) <= 0) {
 				// Соединение разорвано, удаляем сокет из сета
 				close(*it);
 				_clients.erase(*it);
@@ -127,16 +127,16 @@ void Server::checkFds() {
 			// Отправим данные от клиента парсеру
 			// parser(*it, buf, bytes_read, 0); // (фд клиента, буфер с сообщением, размер сообщения)
 
-			Parser *parser = new Parser(*this);
-			parser->do_parsing(*it, _buf, bytes_read);
+			// Parser *parser = new Parser(*this);
+			// parser->do_parsing(*it, _buf, bytes_read);
 
-			//temParser(*it, _buf, bytes_read);
+			temParser(*it, _buf, bytes_read);
 		}
 		if (FD_ISSET(*it, &_writeset)) {
 			// Посмотрим буфер этого клиента, если есть, что ему писать, то отправим это ему, буфер очистим
 			if (_clients.at(*it)->_buf[0] != 0) {
 				send(*it, _clients.at(*it)->_buf, strlen(_clients.at(*it)->_buf), 0);
-				bzero(_clients.at(*it)->_buf, 1024);
+				bzero(_clients.at(*it)->_buf, 512);
 			}
 		}
 	}
