@@ -12,10 +12,10 @@ Parser::~Parser()
 //для дебага
 void Parser::do_parsing(int fd, char *buf, int size)
 {
-	Cmds cmds(&_server._clients);
+	Cmds cmds(_server);
 	std::string com(buf);
 
-	com.erase(com.size() - 1, 1); // убирает каретку
+	com.erase(com.size() - 2, 2); // убирает каретки
 	if(com.compare(0, 4, "NICK") == 0)
 	{
 		std::cout << "NICK cmd" << std::endl;

@@ -10,8 +10,12 @@
 #include <cstdlib>      // for atoi
 #include <set>          // for std::set
 #include <map>          // for std::map
+#include <vector>
 #include <algorithm>    // for std::max
 #include <utility>
+#include <string>
+#include <sstream>
+#include <queue>
 
 // Для Linux
 #include <cstdio>

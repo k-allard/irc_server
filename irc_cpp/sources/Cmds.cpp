@@ -1,8 +1,9 @@
 #include "../includes/Cmds.hpp"
 
 
-Cmds::Cmds(std::map<int, Client*> *clients): _clients(clients)
+Cmds::Cmds(Server &server): _server(server)
 {
+	_clients = &_server._clients;
 }
 
 Cmds::~Cmds()
@@ -23,13 +24,11 @@ int		Cmds::writeToBuf(int fd, std::string mess)
 	Client *client = findClient(fd);
 	if (client == NULL)
 	{
-		perror("clien not found");
+		perror("client not found");
 		return -1;
 	}
-	bzero(client->_buf, 512);
 	mess += "\r\n";
-	strcpy(client->_buf, mess.c_str());
-	std::cout << "Rpl: " << client->_buf << std::endl;
+	client->_buf.push(mess);
 	return 1;
 }
 
@@ -43,18 +42,18 @@ int		Cmds::setReply(int fd, int code, std::string mess, std::string args)
 	Client *client = findClient(fd);
 	if (client == NULL)
 	{
-		perror("clien not found");
+		perror("client not found");
 		return -1;
 	}
 	// Добавить префикс
-	res = std::to_string(code); // С++11
+	res += ":ircserv.net " + std::to_string(code); // С++11
 	if(!client->getNick().empty())
 		res += " " + client->getNick();
 	else
 		res += " *";
 	if(!args.empty())
 		res += " " + args;
-	res += " " + mess;
+	res += mess;
 	writeToBuf(fd, res);
 	return 0;
 }
@@ -76,14 +75,16 @@ int		Cmds::NICKCmd(int fd, std::string args)
 	Client *client = findClient(fd);
 	if (client == NULL)
 	{
-		perror("clien not found");
+		perror("client not found");
 		return -1;
 	}
+	if(!client->isPass())
+		return setReply(fd, ERR_NOTREGISTERED, ERR_NOTREGISTERED_MSG, "");
 	if(args.empty())
 		return setReply(fd, ERR_NONICKNAMEGIVEN, ERR_NONICKNAMEGIVEN_MSG, "");
 	if(checkNick(args) == 0)
 		return setReply(fd, ERR_ERRONEUSNICKNAME, ERR_ERRONEUSNICKNAME_MSG, args);
-	// проверить есть ли такой ник
+	// TODO проверить есть ли такой ник
 	client->setNick(args);
 	return 0;
 }
@@ -93,19 +94,62 @@ int		Cmds::PASSCmd(int fd, std::string args)
 	Client *client = findClient(fd);
 	if (client == NULL)
 	{
-		perror("clien not found");
+		perror("client not found");
 		return -1;
 	}
+	if(client->isPass())
+		return setReply(fd, ERR_ALREADYREGISTRED, ERR_ALREADYREGISTRED_MSG, "");
+	if(args.empty())
+		return setReply(fd, ERR_NEEDMOREPARAMS, ERR_NEEDMOREPARAMS_MSG, "PASS");
+	if(args.compare(_server.getPass()) == 0)
+		client->setPass();
+	return 0;
+}
 
+int		Cmds::USERCmd(int fd, std::string args)
+{
+	Client *client = findClient(fd);
+	if (client == NULL)
+	{
+		perror("client not found");
+		return -1;
+	}
+	if(!client->isPass())
+		return setReply(fd, ERR_NOTREGISTERED, ERR_NOTREGISTERED_MSG, "");
+	if(client->isReg())
+		return setReply(fd, ERR_ALREADYREGISTRED, ERR_ALREADYREGISTRED_MSG, "");
+	if(args.empty())
+		return setReply(fd, ERR_NEEDMOREPARAMS, ERR_NEEDMOREPARAMS_MSG, "USER");
+
+	// TODO Вывести в отдельную функцию
+	std::istringstream stream(args);
+	std::vector<std::string> data;
+	std::string tmp;
+	while (std::getline(stream, tmp, ' ')) {
+		if(tmp.empty())
+			continue;
+		data.push_back(tmp);
+		if (data.size() == 4)
+			break ;
+	}
+	if (data.size() < 4)
+		return setReply(fd, ERR_NEEDMOREPARAMS, ERR_NEEDMOREPARAMS_MSG, "USER");
+
+	client->setUserdata(data);
+	setReply(fd, RPL_WELCOME, RPL_WELCOME_MSG, "");
+	setReply(fd, RPL_YOURHOST, RPL_YOURHOST_MSG, "");
+	setReply(fd, RPL_CREATED, RPL_CREATED_MSG, "");
+	setReply(fd, RPL_MYINFO, RPL_MYINFO_MSG, "");
 	return 0;
 }
 
 int		Cmds::JOINCmd(int fd, std::string args)
 {
+
 	Client *client = findClient(fd);
 	if (client == NULL)
 	{
-		perror("clien not found");
+		perror("client not found");
 		return -1;
 	}
 
@@ -117,7 +161,7 @@ int		Cmds::QUITCmd(int fd, std::string args)
 	Client *client = findClient(fd);
 	if (client == NULL)
 	{
-		perror("clien not found");
+		perror("client not found");
 		return -1;
 	}
 
@@ -129,7 +173,7 @@ int		Cmds::PARTCmd(int fd, std::string args)
 	Client *client = findClient(fd);
 	if (client == NULL)
 	{
-		perror("clien not found");
+		perror("client not found");
 		return -1;
 	}
 
@@ -141,7 +185,7 @@ int		Cmds::MOTDCmd(int fd, std::string args)
 	Client *client = findClient(fd);
 	if (client == NULL)
 	{
-		perror("clien not found");
+		perror("client not found");
 		return -1;
 	}
 
@@ -153,7 +197,7 @@ int		Cmds::PRIVMSGCmd(int fd, std::string args)
 	Client *client = findClient(fd);
 	if (client == NULL)
 	{
-		perror("clien not found");
+		perror("client not found");
 		return -1;
 	}
 
@@ -165,7 +209,7 @@ int		Cmds::MODECmd(int fd, std::string args)
 	Client *client = findClient(fd);
 	if (client == NULL)
 	{
-		perror("clien not found");
+		perror("client not found");
 		return -1;
 	}
 
@@ -177,7 +221,7 @@ int		Cmds::KICKCmd(int fd, std::string args)
 	Client *client = findClient(fd);
 	if (client == NULL)
 	{
-		perror("clien not found");
+		perror("client not found");
 		return -1;
 	}
 
@@ -189,19 +233,7 @@ int		Cmds::LUSERCmd(int fd, std::string args)
 	Client *client = findClient(fd);
 	if (client == NULL)
 	{
-		perror("clien not found");
-		return -1;
-	}
-
-	return 0;
-}
-
-int		Cmds::USERCmd(int fd, std::string args)
-{
-	Client *client = findClient(fd);
-	if (client == NULL)
-	{
-		perror("clien not found");
+		perror("client not found");
 		return -1;
 	}
 
@@ -213,7 +245,7 @@ int		Cmds::USERSCmd(int fd, std::string args)
 	Client *client = findClient(fd);
 	if (client == NULL)
 	{
-		perror("clien not found");
+		perror("client not found");
 		return -1;
 	}
 

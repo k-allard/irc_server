@@ -1,5 +1,20 @@
 #pragma once
 
+#define RPL_WELCOME                 001
+#define RPL_WELCOME_MSG             ":Welcome to the Internet Relay Network"
+
+#define RPL_YOURHOST                002 //"Your host is <servername>, running version <ver>"
+#define RPL_YOURHOST_MSG            ":Your host is ircserv.net, running version 1.0"
+
+#define RPL_CREATED                 003 //"This server was created <date>"
+#define RPL_CREATED_MSG             ":This server was created <date>"
+
+#define RPL_MYINFO                  004 //"<servername> <version> <available user modes> <available channel modes>"
+#define RPL_MYINFO_MSG              ":<servername> <version> <available user modes> <available channel modes>"
+
+//- The server sends Replies 001 to 004 to a user upon
+//successful registration.
+
 #define ERR_NOSUCHNICK				401 //"<nickname> :No such nick/channel"
 #define ERR_NOSUCHNICK_MSG			":No such nick/channel"
 									//- Used to indicate the nickname parameter supplied to a
@@ -113,17 +128,20 @@
 //                 - Returned as a response to the USERS command.  Must be
 //                   returned by any server which does not implement it.
 
-// #define         451     ERR_NOTREGISTERED // ":You have not registered"
+#define    ERR_NOTREGISTERED     451      // ":You have not registered"
+#define		ERR_NOTREGISTERED_MSG ":You have not registered"
 //                 - Returned by the server to indicate that the client
 //                   must be registered before the server will allow it
 //                   to be parsed in detail.
 
-// #define         461     ERR_NEEDMOREPARAMS //"<command> :Not enough parameters"
+#define     ERR_NEEDMOREPARAMS    461      //"<command> :Not enough parameters"
+#define     ERR_NEEDMOREPARAMS_MSG ":Not enough parameters"
 //                 - Returned by the server by numerous commands to
 //                   indicate to the client that it didn't supply enough
 //                   parameters.
 
-// #define         462     ERR_ALREADYREGISTRED// ":You may not reregister"
+#define    ERR_ALREADYREGISTRED    462     // ":You may not reregister"
+#define    ERR_ALREADYREGISTRED_MSG  ":You may not reregister"
 //                 - Returned by the server to any link which tries to
 //                   change part of the registered details (such as
 //                   password or user details from second USER message).

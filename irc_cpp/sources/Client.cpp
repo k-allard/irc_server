@@ -3,13 +3,8 @@
 Client::Client(int fd, struct sockaddr_in address) : _fd(fd), _address(address)
 {
 	this->_nick = "";
-	this->_user = "";
-	this->_host = "";
-	this->_server = "";
-	this->_real = "";
 	this->_isreg = false;
-	this->_buf = new char[512];
-    bzero(this->_buf, 512);
+	this->_ispass = false;
 }
 
 Client::Client(const Client &src)
@@ -19,25 +14,19 @@ Client::Client(const Client &src)
 
 Client &Client::operator=(const Client &src)
 {
-	_user = src._user;
-	_host = src._host;
-	_server = src._server;
-	_real = src._real;
-	_isreg = src._isreg; 
+	_nick = src._nick;
+	_userdata = src._userdata;
+	_isreg = src._isreg;
+	_ispass = src._ispass;
 	return *this;
 }
 
 Client::~Client()
 {
-	delete[] this->_buf;
 }
 
-void	Client::setUserData(const std::string &user, const std::string &host, 
-							const std::string &server, const std::string &real)
+void	Client::setUserdata(std::vector<std::string> data)
 {
-	this->_user = user;
-	this->_host = host;
-	this->_server = server;
-	this->_real = real;
+	this->_userdata = data;
 	this->_isreg = true; 
 }

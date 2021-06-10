@@ -52,35 +52,60 @@ std::cout << "Our clients: ";
 				std::cout << " Nick: " << it->second->getNick();
 			std::cout << " | ";
 		}
-		std::cout << std::endl;
+		std::cout << std::endl << std::endl;
 }
 
 //для дебага
 void Server::temParser(int fd, char *buf, int size)
 {
-	Cmds cmds(&_clients);
+	Cmds cmds(*this);
 	std::string com(buf);
-
-	com.erase(com.size() - 1, 1); // убирает каретку
-	if(com.compare(0, 4, "NICK") == 0)
-	{
-		std::cout << "NICK cmd" << std::endl;
-		std::string nick = "";
-		if(com.size() > 4)
-			nick = com.substr(5, com.npos);
-		if (cmds.NICKCmd(fd, nick) == -1)
-			perror("nick err");
-		return ;
+	std::istringstream stream(com);
+	std::queue<std::string> data;
+	std::string tmp;
+	while (std::getline(stream, tmp, '\n')) {
+		if(tmp.empty())
+			continue;
+		tmp.erase(tmp.size() - 1, 1);
+		//std::cout << "[" << tmp << "]\n";
+		data.push(tmp);
 	}
-	if(com.compare(0, 3, "PMN") == 0) // для дебага. нет такой команды)
+	while(!data.empty())
 	{
-		Client *client = cmds.findClient(fd);
-		std::string nick = client->getNick();
-		if (nick == "")
-			std::cout << fd << " fd`s nick is not set\n";
-		else
-			std::cout << fd << " fd`s nick: " << client->getNick() << std::endl;
-		return ;
+		if (data.front().compare(0, 4, "NICK") == 0) {
+			std::cout << "NICK cmd" << std::endl;
+			std::string nick = "";
+			if (data.front().size() > 4)
+				nick = data.front().substr(5, data.front().npos);
+			if (cmds.NICKCmd(fd, nick) == -1)
+				perror("NICK err");
+		}
+		else if (data.front().compare(0, 4, "PASS") == 0) {
+			std::cout << "PASS cmd" << std::endl;
+			std::string args = "";
+			if (data.front().size() > 4)
+				args = data.front().substr(5, data.front().npos);
+			if (cmds.PASSCmd(fd, args) == -1)
+				perror("PASS err");
+		}
+		else if (data.front().compare(0, 4, "USER") == 0) {
+			std::cout << "USER cmd" << std::endl;
+			std::string args = "";
+			if (data.front().size() > 4)
+				args = data.front().substr(5, data.front().npos);
+			if (cmds.USERCmd(fd, args) == -1)
+				perror("USER err");
+		}
+		else if (data.front().compare(0, 3, "PMN") == 0) // для дебага. нет такой команды)
+		{
+			Client *client = cmds.findClient(fd);
+			std::string nick = client->getNick();
+			if (nick == "")
+				std::cout << fd << " fd`s nick is not set\n";
+			else
+				std::cout << fd << " fd`s nick: " << client->getNick() << std::endl;
+		}
+		data.pop();
 	}
 }
 
@@ -134,9 +159,9 @@ void Server::checkFds() {
 		}
 		if (FD_ISSET(*it, &_writeset)) {
 			// Посмотрим буфер этого клиента, если есть, что ему писать, то отправим это ему, буфер очистим
-			if (_clients.at(*it)->_buf[0] != 0) {
-				send(*it, _clients.at(*it)->_buf, strlen(_clients.at(*it)->_buf), 0);
-				bzero(_clients.at(*it)->_buf, 512);
+			if (!_clients.at(*it)->_buf.empty()) {
+				send(*it, _clients.at(*it)->_buf.front().c_str(), _clients.at(*it)->_buf.front().size(), 0);
+				_clients.at(*it)->_buf.pop();
 			}
 		}
 	}
