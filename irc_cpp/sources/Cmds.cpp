@@ -70,6 +70,17 @@ int		Cmds::checkNick(std::string nick)
 	return 1;
 }
 
+Client *Cmds::findClientNick(std::string nick)
+{
+	std::map<int, Client*>::iterator en = _clients->end();
+	for (std::map<int, Client*>::iterator beg = _clients->begin(); beg != en; ++beg)
+	{
+		if (beg->second->getNick() == nick)
+			return (beg->second);
+	}
+	return NULL;
+}
+
 int		Cmds::NICKCmd(int fd, std::string args)
 {
 	Client *client = findClient(fd);
