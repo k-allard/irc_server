@@ -1,7 +1,7 @@
 #pragma once
 
 #define RPL_WELCOME                 001
-#define RPL_WELCOME_MSG             ":Welcome to the Internet Relay Network"
+#define RPL_WELCOME_MSG             ":Welcome to the Internet Relay Network <nick>!<user>@<host>"
 
 #define RPL_YOURHOST                002 //"Your host is <servername>, running version <ver>"
 #define RPL_YOURHOST_MSG            ":Your host is ircserv.net, running version 1.0"

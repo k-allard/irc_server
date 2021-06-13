@@ -7,25 +7,30 @@ private:
 	int					        _fd;
 	struct sockaddr_in	        _address;
 	std::string			        _nick;
-	std::vector<std::string>    _userdata;
+	std::vector<std::string>    _userdata; //0 = username, 1 = host, 2 = server, 3 = real name
+	std::string                 _prefix;
 	bool                        _ispass; // отправлен ли правильный пароль (после PASS)
 	bool				        _isreg; // зарегистрирован ли клиент (только после NICK USER)
+
+	// Формула префикса для клиента: <nick>!<user>@<host>
+	void        setPrefix();
 
 public:
 	Client(int fd, struct sockaddr_in address);
 	Client(const Client& src);
 	Client& operator=(const Client& src);
 	~Client();
-	std::queue<std::string>		_buf; // буфер каждого клиента для получения сообщений от сервера TODT
+	std::queue<std::string>		_buf; // буфер каждого клиента для получения сообщений от сервера
 
 	// Set nick (для NICK)
 	void		setNick(std::string nick) {this->_nick = nick;};
 
-	// Set userdata и помечает клиета как зарегестрированный (для USER)
+	// Set userdata и помечает клиента как зарегистрированный (для USER)
 	void		setUserdata(std::vector<std::string> data);
 	void        setPass() {this->_ispass = true;};
 
-	// Зарегестрированн ли клиент (незарегестрированному клиенту недоступны никакие команды кроме PASS USER NICK)
+
+	// Зарегистрирован ли клиент (незарегистрированному клиенту недоступны никакие команды кроме PASS USER NICK)
 	bool		isReg() {return this->_isreg;};
 	bool        isPass() {return this->_ispass;};
 

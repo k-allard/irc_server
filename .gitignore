@@ -8,3 +8,4 @@ bircd
 client
 server
 .idea/
+CMakeLists.txt
