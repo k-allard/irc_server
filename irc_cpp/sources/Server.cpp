@@ -147,15 +147,19 @@ void Server::checkFds() {
 				printClients();
 				break ;
 			}
-			std::string clientWrote(_buf);
-			std::cout << "Client " << *it << " wrote: " << clientWrote << std::endl;
+			_clients.at(*it)->appendMessageBuffer(_buf);
+			if(_clients.at(*it)->isMessageBufferComplete())
+			{
+				temParser(*it, _clients.at(*it)->messageBuf, _clients.at(*it)->_messageBufLength);
+				_clients.at(*it)->clearMessageBuffer();
+			}
+
 			// Отправим данные от клиента парсеру
 			// parser(*it, buf, bytes_read, 0); // (фд клиента, буфер с сообщением, размер сообщения)
 
 			// Parser *parser = new Parser(*this);
 			// parser->do_parsing(*it, _buf, bytes_read);
 
-			temParser(*it, _buf, bytes_read);
 		}
 		if (FD_ISSET(*it, &_writeset)) {
 			// Посмотрим буфер этого клиента, если есть, что ему писать, то отправим это ему, буфер очистим

@@ -18,6 +18,13 @@ public:
 	~Client();
 	std::queue<std::string>		_buf; // буфер каждого клиента для получения сообщений от сервера TODT
 
+	char		messageBuf[513];
+	int			_messageBufLength; // длина текста в messageBuf
+	void		clearMessageBuffer();
+	void		appendMessageBuffer(char newInputBuf[512]);
+	int			isMessageBufferComplete();
+
+	
 	// Set nick (для NICK)
 	void		setNick(std::string nick) {this->_nick = nick;};
 
