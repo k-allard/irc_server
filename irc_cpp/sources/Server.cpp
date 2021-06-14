@@ -60,51 +60,51 @@ void Server::temParser(int fd, char *buf, int size)
 {
 	Cmds cmds(*this);
 	std::string com(buf);
-	std::istringstream stream(com);
+	std::istringstream stream(buf);
 	std::queue<std::string> data;
 	std::string tmp;
 	while (std::getline(stream, tmp, '\n')) {
 		if(tmp.empty())
 			continue;
 		tmp.erase(tmp.size() - 1, 1);
-		//std::cout << "[" << tmp << "]\n";
+		std::cout << "[" << tmp << "]\n";
 		data.push(tmp);
 	}
 	while(!data.empty())
 	{
+        std::string args = "";
+        if (data.front().size() > 4)
+            args = data.front().substr(5, data.front().npos);
+        //std::cout << "Args: " << args << std::endl;
 		if (data.front().compare(0, 4, "NICK") == 0) {
 			std::cout << "NICK cmd" << std::endl;
-			std::string nick = "";
-			if (data.front().size() > 4)
-				nick = data.front().substr(5, data.front().npos);
-			if (cmds.NICKCmd(fd, nick) == -1)
+			if (cmds.NICKCmd(fd, args) == -1)
 				perror("NICK err");
 		}
 		else if (data.front().compare(0, 4, "PASS") == 0) {
 			std::cout << "PASS cmd" << std::endl;
-			std::string args = "";
-			if (data.front().size() > 4)
-				args = data.front().substr(5, data.front().npos);
 			if (cmds.PASSCmd(fd, args) == -1)
 				perror("PASS err");
 		}
 		else if (data.front().compare(0, 4, "USER") == 0) {
 			std::cout << "USER cmd" << std::endl;
-			std::string args = "";
-			if (data.front().size() > 4)
-				args = data.front().substr(5, data.front().npos);
 			if (cmds.USERCmd(fd, args) == -1)
 				perror("USER err");
 		}
 		else if (data.front().compare(0, 3, "PMN") == 0) // для дебага. нет такой команды)
 		{
 			Client *client = cmds.findClient(fd);
-			std::string nick = client->getNick();
-			if (nick == "")
+			if (client->getNick().empty())
 				std::cout << fd << " fd`s nick is not set\n";
 			else
 				std::cout << fd << " fd`s nick: " << client->getNick() << std::endl;
 		}
+		else if(data.front().compare(0, 4, "PING") == 0)
+        {
+            std::cout << "PONG cmd" << std::endl;
+            if (cmds.PONGCmd(fd, args) == -1)
+                perror("PONG err");
+        }
 		data.pop();
 	}
 }
@@ -164,7 +164,9 @@ void Server::checkFds() {
 		if (FD_ISSET(*it, &_writeset)) {
 			// Посмотрим буфер этого клиента, если есть, что ему писать, то отправим это ему, буфер очистим
 			if (!_clients.at(*it)->_buf.empty()) {
+			    std::cout << "Rpl: " << _clients.at(*it)->_buf.front();
 				send(*it, _clients.at(*it)->_buf.front().c_str(), _clients.at(*it)->_buf.front().size(), 0);
+				_clients.at(*it)->_buf.front().erase();
 				_clients.at(*it)->_buf.pop();
 			}
 		}

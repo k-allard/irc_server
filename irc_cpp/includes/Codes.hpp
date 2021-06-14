@@ -53,7 +53,8 @@
 //                   without valid prefixes.
 
 // #define         411     ERR_NORECIPIENT // ":No recipient given (<command>)"
-// #define         412     ERR_NOTEXTTOSEND // ":No text to send"
+#define ERR_NOTEXTTOSEND 412 // ":No text to send"
+#define ERR_NOTEXTTOSEND_MSG ":No text to send"
 // #define         413     ERR_NOTOPLEVEL // "<mask> :No toplevel domain specified"
 // #define         414     ERR_WILDTOPLEVEL // "<mask> :Wildcard in toplevel domain"
 
