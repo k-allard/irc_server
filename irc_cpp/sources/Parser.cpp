@@ -20,17 +20,16 @@ void Parser::do_parsing(int fd, char *buf, int size)
 	while (std::getline(stream, tmp, '\n')) {
 		if(tmp.empty())
 			continue;
-		tmp.erase(tmp.size() - 1, 1);
 		if (tmp.at(tmp.size() - 1) == '\r')
 			tmp.erase(tmp.size() - 1, 1);
-		//std::cout << "[" << tmp << "]\n";
+		std::cerr << "[" << tmp << "]" << std::endl;
 		data.push(tmp);
 	}
 	while(!data.empty()) {
 		Message msg = Message(data.front());
 		if(msg.command->cmdType == MsgCmd__UNKNOWN)
 		{
-			std::cerr << "Parser: Unknown client #" << fd << " input :" << std::endl;
+			std::cerr << "Parser: Unknown command from client #" << fd << ". Client input :" << std::endl;
 			std::cerr << "       \"" << data.front() << "\"" << std::endl;
 			std::cout << std::endl;
 		}
@@ -43,9 +42,9 @@ void Parser::do_parsing(int fd, char *buf, int size)
 			std::cout << "        Command.Type: " << msg.command->cmdType << std::endl;
 			std::cout << "        Command.Letters: " << msg.command->letters << std::endl;
 			std::cout << "        Command.Numbers: " << msg.command->numbers << std::endl;
-			std::cout << "        Command.Params: " << msg.params << std::endl;			
+			std::cout << "        Command.Params: " << msg.params->toString() << std::endl;
 		}
-		
+
 		data.pop();
 	}
 
