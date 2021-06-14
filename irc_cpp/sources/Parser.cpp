@@ -9,9 +9,10 @@ Parser::~Parser()
 {
 }
 
-//для дебага
-void Parser::do_parsing(int fd, char *buf, int size)
+
+std::vector<Message> Parser::do_parsing(int fd, char *buf, int size)
 {
+	std::vector<Message> result;
 	Cmds cmds(this->_server);
 	std::string com(buf);
 	std::istringstream stream(com);
@@ -27,6 +28,9 @@ void Parser::do_parsing(int fd, char *buf, int size)
 	}
 	while(!data.empty()) {
 		Message msg = Message(data.front());
+		result.push_back(msg);
+
+		// for DEBUG
 		if(msg.command->cmdType == MsgCmd__UNKNOWN)
 		{
 			std::cerr << "Parser: Unknown command from client #" << fd << ". Client input :" << std::endl;
@@ -47,28 +51,5 @@ void Parser::do_parsing(int fd, char *buf, int size)
 
 		data.pop();
 	}
-
-
-//	Cmds cmds(_server);
-//	std::string com(buf);
-//
-//	com.erase(com.size() - 2, 2); // убирает каретки
-//	if(com.compare(0, 4, "NICK") == 0)
-//	{
-//		std::cout << "NICK cmd" << std::endl;
-//		std::string nick = com.substr(5, com.npos);
-//		if (cmds.NICKCmd(fd, com.substr(5, com.npos)) == -1)
-//			perror("nick err");
-//		return ;
-//	}
-//	if(com.compare(0, 3, "PMN") == 0) // для дебага. нет такой команды)
-//	{
-//		Client *client = cmds.findClient(fd);
-//		std::string nick = client->getNick();
-//		if (nick == "")
-//			std::cout << fd << " fd`s nick is not set\n";
-//		else
-//			std::cout << fd << " fd`s nick: " << client->getNick() << std::endl;
-//		return ;
-//	}
+	return (result);
 }

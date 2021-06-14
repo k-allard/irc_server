@@ -15,14 +15,14 @@ Client *Cmds::findClient(int fd)
 	std::map<int, Client*>::iterator it;
 	it = _clients->find(fd);
 	if (it == _clients->end())
-		return NULL;
+		return nullptr;
 	return it->second;
 }
 
 int		Cmds::writeToBuf(int fd, std::string mess)
 {
 	Client *client = findClient(fd);
-	if (client == NULL)
+	if (client == nullptr)
 	{
 		perror("client not found");
 		return -1;
@@ -40,7 +40,7 @@ int		Cmds::setReply(int fd, int code, std::string mess, std::string args)
 {
 	std::string res;
 	Client *client = findClient(fd);
-	if (client == NULL)
+	if (client == nullptr)
 	{
 		perror("client not found");
 		return -1;
@@ -53,38 +53,39 @@ int		Cmds::setReply(int fd, int code, std::string mess, std::string args)
 		res += " *";
 	if(!args.empty())
 		res += " " + args;
-	res += mess;
+	res += " " + mess;
 	writeToBuf(fd, res);
 	return 0;
 }
 
+//TODO C++11 extension!!!
 int		Cmds::checkNick(std::string nick)
 {
 	if(nick.size() > 9)
 		return 0;
-	for(int i = 0; i < nick.size(); i++)
+	for(char i : nick)
 	{
-		if(nick[i] < 33 || nick[i] > 126)
+		if(i < 33 || i > 126)
 			return 0;
 	}
 	return 1;
 }
 
-Client *Cmds::findClientNick(std::string nick)
+Client *Cmds::findClientNick(const std::string& nick)
 {
-	std::map<int, Client*>::iterator en = _clients->end();
-	for (std::map<int, Client*>::iterator beg = _clients->begin(); beg != en; ++beg)
+	std::map<int,Client*>::iterator en = _clients->end();
+	for (std::map<int,Client*>::iterator beg = _clients->begin(); beg != en; ++beg)
 	{
 		if (beg->second->getNick() == nick)
 			return (beg->second);
 	}
-	return NULL;
+	return nullptr;
 }
 
 int		Cmds::NICKCmd(int fd, std::string args)
 {
 	Client *client = findClient(fd);
-	if (client == NULL)
+	if (client == nullptr)
 	{
 		perror("client not found");
 		return -1;
@@ -103,7 +104,7 @@ int		Cmds::NICKCmd(int fd, std::string args)
 int		Cmds::PASSCmd(int fd, std::string args)
 {
 	Client *client = findClient(fd);
-	if (client == NULL)
+	if (client == nullptr)
 	{
 		perror("client not found");
 		return -1;
@@ -112,15 +113,15 @@ int		Cmds::PASSCmd(int fd, std::string args)
 		return setReply(fd, ERR_ALREADYREGISTRED, ERR_ALREADYREGISTRED_MSG, "");
 	if(args.empty())
 		return setReply(fd, ERR_NEEDMOREPARAMS, ERR_NEEDMOREPARAMS_MSG, "PASS");
-	if(args.compare(_server.getPass()) == 0)
-		client->setPass();
+	if(args == _server.getPass())
+	    client->setPass();
 	return 0;
 }
 
 int		Cmds::USERCmd(int fd, std::string args)
 {
 	Client *client = findClient(fd);
-	if (client == NULL)
+	if (client == nullptr)
 	{
 		perror("client not found");
 		return -1;
@@ -156,109 +157,52 @@ int		Cmds::USERCmd(int fd, std::string args)
 
 int		Cmds::JOINCmd(int fd, std::string args)
 {
-
-	Client *client = findClient(fd);
-	if (client == NULL)
-	{
-		perror("client not found");
-		return -1;
-	}
-
 	return 0;
 }
 
 int		Cmds::QUITCmd(int fd, std::string args)
 {
-	Client *client = findClient(fd);
-	if (client == NULL)
-	{
-		perror("client not found");
-		return -1;
-	}
-
 	return 0;
 }
 
 int		Cmds::PARTCmd(int fd, std::string args)
 {
-	Client *client = findClient(fd);
-	if (client == NULL)
-	{
-		perror("client not found");
-		return -1;
-	}
-
 	return 0;
 }
 
 int		Cmds::MOTDCmd(int fd, std::string args)
 {
-	Client *client = findClient(fd);
-	if (client == NULL)
-	{
-		perror("client not found");
-		return -1;
-	}
-
 	return 0;
 }
 
 int		Cmds::PRIVMSGCmd(int fd, std::string args)
 {
-	Client *client = findClient(fd);
-	if (client == NULL)
-	{
-		perror("client not found");
-		return -1;
-	}
 
 	return 0;
 }
 
 int		Cmds::MODECmd(int fd, std::string args)
 {
-	Client *client = findClient(fd);
-	if (client == NULL)
-	{
-		perror("client not found");
-		return -1;
-	}
-
 	return 0;
 }
 
 int		Cmds::KICKCmd(int fd, std::string args)
 {
-	Client *client = findClient(fd);
-	if (client == NULL)
-	{
-		perror("client not found");
-		return -1;
-	}
-
 	return 0;
 }
 
 int		Cmds::LUSERCmd(int fd, std::string args)
 {
-	Client *client = findClient(fd);
-	if (client == NULL)
-	{
-		perror("client not found");
-		return -1;
-	}
-
 	return 0;
 }
 
 int		Cmds::USERSCmd(int fd, std::string args)
 {
-	Client *client = findClient(fd);
-	if (client == NULL)
-	{
-		perror("client not found");
-		return -1;
-	}
-
 	return 0;
+}
+
+int		Cmds::PONGCmd(int fd, std::string args)
+{
+    writeToBuf(fd, "PONG " + args);
+    return 0;
 }
