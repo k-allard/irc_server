@@ -4,6 +4,7 @@ Server::Server(int port, std::string pass) : _port(port), _pass(pass), _server_f
 	initServer();
 	_clients_fd.clear();
 	_clients.clear();
+	_parser = new Parser(*this);
 };
 
 Server::~Server() {
@@ -11,6 +12,7 @@ Server::~Server() {
 	for (it = _clients.begin(); it != _clients.end(); ++it)
 		delete it->second;
 	_clients.clear();
+	delete _parser;
 }
 
 void Server::initFds() {
@@ -150,7 +152,8 @@ void Server::checkFds() {
 			_clients.at(*it)->appendMessageBuffer(_buf);
 			if(_clients.at(*it)->isMessageBufferComplete())
 			{
-				temParser(*it, _clients.at(*it)->messageBuf, _clients.at(*it)->_messageBufLength);
+				_parser->do_parsing(*it, _clients.at(*it)->messageBuf, _clients.at(*it)->_messageBufLength);
+				// temParser(*it, _clients.at(*it)->messageBuf, _clients.at(*it)->_messageBufLength);
 				_clients.at(*it)->clearMessageBuffer();
 			}
 
