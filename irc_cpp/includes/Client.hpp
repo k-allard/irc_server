@@ -33,7 +33,7 @@ public:
 	void		setNick(std::string nick) {this->_nick = nick;};
 
 	// Set userdata и помечает клиента как зарегистрированный (для USER)
-	void		setUserdata(std::vector<std::string> data);
+	void		setUserdata(std::vector<std::string> data) {this->_userdata = data;};
 	void        setPass() {this->_ispass = true;};
 
 
@@ -44,4 +44,7 @@ public:
 	// Getters
 	int					getFd() {return this->_fd;};
 	const std::string	&getNick() {return this->_nick;};
+    std::vector<std::string> *getUserdata() {return &this->_userdata;};
+
+    void                registr();
 };

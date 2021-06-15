@@ -38,11 +38,10 @@ Client::~Client()
 {
 }
 
-void	Client::setUserdata(std::vector<std::string> data)
+void    Client::registr()
 {
-	this->_userdata = data;
-	this->_isreg = true;
-	setPrefix();
+    this->_isreg = true;
+    this->setPrefix();
 }
 
 void	Client::clearMessageBuffer()
