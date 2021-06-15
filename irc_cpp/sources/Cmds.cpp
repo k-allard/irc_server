@@ -15,14 +15,25 @@ Client *Cmds::findClient(int fd)
 	std::map<int, Client*>::iterator it;
 	it = _clients->find(fd);
 	if (it == _clients->end())
-		return nullptr;
+		return NULL;
 	return it->second;
+}
+
+void            Cmds::regClient(int fd)
+{
+    Client *client = findClient(fd);
+
+    client->registr();
+    setReply(fd, RPL_WELCOME, RPL_WELCOME_MSG, "");
+    setReply(fd, RPL_YOURHOST, RPL_YOURHOST_MSG, "");
+    setReply(fd, RPL_CREATED, RPL_CREATED_MSG, "");
+    setReply(fd, RPL_MYINFO, RPL_MYINFO_MSG, "");
 }
 
 int		Cmds::writeToBuf(int fd, std::string mess)
 {
 	Client *client = findClient(fd);
-	if (client == nullptr)
+	if (client == NULL)
 	{
 		perror("client not found");
 		return -1;
@@ -40,12 +51,11 @@ int		Cmds::setReply(int fd, int code, std::string mess, std::string args)
 {
 	std::string res;
 	Client *client = findClient(fd);
-	if (client == nullptr)
+	if (client == NULL)
 	{
 		perror("client not found");
 		return -1;
 	}
-	// Добавить префикс
 	res += ":ircserv.net " + std::to_string(code); // С++11
 	if(!client->getNick().empty())
 		res += " " + client->getNick();
@@ -63,11 +73,11 @@ int		Cmds::checkNick(std::string nick)
 {
 	if(nick.size() > 9)
 		return 0;
-	for(char i : nick)
-	{
-		if(i < 33 || i > 126)
-			return 0;
-	}
+    for(int i = 0; i < nick.size(); i++)
+    {
+        if(nick[i] < 33 || nick[i] > 126)
+            return 0;
+    }
 	return 1;
 }
 
@@ -79,13 +89,13 @@ Client *Cmds::findClientNick(const std::string& nick)
 		if (beg->second->getNick() == nick)
 			return (beg->second);
 	}
-	return nullptr;
+	return NULL;
 }
 
 int		Cmds::NICKCmd(int fd, std::string args)
 {
 	Client *client = findClient(fd);
-	if (client == nullptr)
+	if (client == NULL)
 	{
 		perror("client not found");
 		return -1;
@@ -96,15 +106,20 @@ int		Cmds::NICKCmd(int fd, std::string args)
 		return setReply(fd, ERR_NONICKNAMEGIVEN, ERR_NONICKNAMEGIVEN_MSG, "");
 	if(checkNick(args) == 0)
 		return setReply(fd, ERR_ERRONEUSNICKNAME, ERR_ERRONEUSNICKNAME_MSG, args);
-	// TODO проверить есть ли такой ник
-	client->setNick(args);
+	if(findClientNick(args) != NULL)
+        return setReply(fd, ERR_NICKNAMEINUSE, ERR_NICKNAMEINUSE_MSG, args);
+	else {
+        client->setNick(args);
+        if (!client->getUserdata()->empty())
+            regClient(fd);
+    }
 	return 0;
 }
 
 int		Cmds::PASSCmd(int fd, std::string args)
 {
 	Client *client = findClient(fd);
-	if (client == nullptr)
+	if (client == NULL)
 	{
 		perror("client not found");
 		return -1;
@@ -113,6 +128,8 @@ int		Cmds::PASSCmd(int fd, std::string args)
 		return setReply(fd, ERR_ALREADYREGISTRED, ERR_ALREADYREGISTRED_MSG, "");
 	if(args.empty())
 		return setReply(fd, ERR_NEEDMOREPARAMS, ERR_NEEDMOREPARAMS_MSG, "PASS");
+	if(args[0] == ':')
+        args.erase(args.begin());
 	if(args == _server.getPass())
 	    client->setPass();
 	return 0;
@@ -121,7 +138,7 @@ int		Cmds::PASSCmd(int fd, std::string args)
 int		Cmds::USERCmd(int fd, std::string args)
 {
 	Client *client = findClient(fd);
-	if (client == nullptr)
+	if (client == NULL)
 	{
 		perror("client not found");
 		return -1;
@@ -148,10 +165,8 @@ int		Cmds::USERCmd(int fd, std::string args)
 		return setReply(fd, ERR_NEEDMOREPARAMS, ERR_NEEDMOREPARAMS_MSG, "USER");
 
 	client->setUserdata(data);
-	setReply(fd, RPL_WELCOME, RPL_WELCOME_MSG, "");
-	setReply(fd, RPL_YOURHOST, RPL_YOURHOST_MSG, "");
-	setReply(fd, RPL_CREATED, RPL_CREATED_MSG, "");
-	setReply(fd, RPL_MYINFO, RPL_MYINFO_MSG, "");
+	if(!client->getNick().empty())
+        regClient(fd);
 	return 0;
 }
 

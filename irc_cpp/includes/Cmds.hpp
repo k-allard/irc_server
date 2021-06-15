@@ -13,6 +13,7 @@ private:
 	// int     checkClient(int fd); // TODO проверяет существует и зарегестрирован ли клиент (для вызова перед каждой коммандой кроме PASS NICK USER)
 	int		writeToBuf(int fd, std::string mess); //Записать сообщение в буфер клиента для отправки
 	static int		checkNick(std::string nick); // проверка валидности ника max_len = 9, ascii 33-125 dec
+	void            regClient(int fd);
 
 public:
 	Cmds(Server &server);
