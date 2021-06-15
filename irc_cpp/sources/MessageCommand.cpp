@@ -27,7 +27,10 @@ MessageCommand::MessageCommand(char *string)
 MessageCommand::MessageCommand(std::string::const_iterator &it, const std::string::const_iterator &end)
 {
 	this->letters = this->getLetters(it, end);
-	this->cmdType = this->str2enum(this->letters);
+	if(it < end && *it != ' ')
+		this->cmdType = MsgCmd__UNKNOWN;
+	else
+		this->cmdType = this->str2enum(this->letters);
 	this->numbers = 0;
 }
 
@@ -72,10 +75,20 @@ std::string MessageCommand::getLetters(std::string::const_iterator &it, const st
 	return str;
 }
 
+std::string str_toupper(std::string s) {
+	std::transform(s.begin(), s.end(), s.begin(),
+			// static_cast<int(*)(int)>(std::toupper)         // wrong
+			// [](int c){ return std::toupper(c); }           // wrong
+			// [](char c){ return std::toupper(c); }          // wrong
+				   [](unsigned char c){ return std::toupper(c); } // correct
+	);
+	return s;
+}
 
-MessageCommandEnum MessageCommand::str2enum(std::string &string)
+MessageCommandEnum MessageCommand::str2enum(std::string &str)
 {
 	MessageCommandEnum msgEnum;
+	std::string string = str_toupper(str);
 
 	if(string == "PASS")
 		msgEnum = MsgCmd_PASS;

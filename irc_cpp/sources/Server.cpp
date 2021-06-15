@@ -127,6 +127,10 @@ void Server::checkFds() {
 								perror("PONG err");
 							break;
 						}
+						case MsgCmd__UNKNOWN : {
+							cmds.setReply(*it, ERR_UNKNOWNCOMMAND, ERR_UNKNOWNCOMMAND_MSG, (*msg).command->letters);
+							break;
+						}
 					}
 				}
 				_clients.at(*it)->clearMessageBuffer();
