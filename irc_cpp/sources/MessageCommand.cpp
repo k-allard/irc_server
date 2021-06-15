@@ -76,13 +76,15 @@ std::string MessageCommand::getLetters(std::string::const_iterator &it, const st
 }
 
 std::string str_toupper(std::string s) {
-	std::transform(s.begin(), s.end(), s.begin(),
-			// static_cast<int(*)(int)>(std::toupper)         // wrong
-			// [](int c){ return std::toupper(c); }           // wrong
-			// [](char c){ return std::toupper(c); }          // wrong
-				   [](unsigned char c){ return std::toupper(c); } // correct
-	);
-	return s;
+	std::string str("");
+	for (std::string::const_iterator i = s.cbegin(); i != s.cend(); ++i)
+	{
+		unsigned char c = *i;
+		str += std::toupper(c);
+	}
+
+
+	return (str);
 }
 
 MessageCommandEnum MessageCommand::str2enum(std::string &str)
