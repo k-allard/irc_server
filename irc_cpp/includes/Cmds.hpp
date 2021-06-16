@@ -20,7 +20,6 @@ public:
 	~Cmds();
 
 	int		setReply(int fd, int code, std::string mess, std::string args); // создает сообщение по коду ошибки и отправляет его в writeToBuf
-
 	Client *findClient(int fd); // Ишет инстанс клиента по fd
 
 	int		NICKCmd(int fd, std::string args);
