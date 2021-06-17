@@ -139,7 +139,8 @@ void Server::checkFds() {
                             break;
                         }
 						case MsgCmd__UNKNOWN : {
-							cmds.setReply(*it, ERR_UNKNOWNCOMMAND, ERR_UNKNOWNCOMMAND_MSG, (*msg).command->letters);
+							if (_clients.at(*it)->isReg())
+								cmds.setReply(*it, ERR_UNKNOWNCOMMAND, ERR_UNKNOWNCOMMAND_MSG, (*msg).command->letters);
 							break;
 						}
 					}
