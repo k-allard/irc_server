@@ -44,6 +44,10 @@ public:
 	// Getters
 	int					getFd() {return this->_fd;};
 	const std::string	&getNick() {return this->_nick;};
+	const std::string   &getUsername() {return this->_userdata[0];};
+    const std::string   &getHost() {return this->_userdata[1];};
+    const std::string   &getServer() {return this->_userdata[2];};
+    const std::string   &getRealname() {return this->_userdata[3];};
     std::vector<std::string> *getUserdata() {return &this->_userdata;};
 
     void                registr();

@@ -170,6 +170,7 @@ int		Cmds::USERCmd(int fd, std::string args)
 	return 0;
 }
 
+// JOIN #here, #there 123
 int		Cmds::JOINCmd(int fd, std::string args)
 {
 	return 0;
@@ -177,9 +178,13 @@ int		Cmds::JOINCmd(int fd, std::string args)
 
 int		Cmds::QUITCmd(int fd, std::string args)
 {
+    writeToBuf(fd, "ERROR Closing Link");
+    _server.disconnectClient(fd);
+    // отправить команнду QUIT всем каналам в которых был этот юзер с аргументом (если не дан то ник)
 	return 0;
 }
 
+//PART #here, :#there zzz
 int		Cmds::PARTCmd(int fd, std::string args)
 {
 	return 0;

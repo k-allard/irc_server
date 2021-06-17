@@ -15,6 +15,16 @@ Server::~Server() {
 	delete _parser;
 }
 
+int     Server::disconnectClient(int fd)
+{
+    close(fd);
+    _clients.erase(fd);
+    _clients_fd.erase(fd);
+    std::cout << "\n+++++++ Сlient gone away! ++++++++\n\n";
+    printClients();
+    return 0;
+}
+
 void Server::initFds() {
 
 	FD_ZERO(&_readset);
@@ -88,11 +98,7 @@ void Server::checkFds() {
 			// Поступили данные от клиента, читаем их
 			if ((bytes_read = recv(*it, _buf, 512, 0)) <= 0) {
 				// Соединение разорвано, удаляем сокет из сета
-				close(*it);
-				_clients.erase(*it);
-				_clients_fd.erase(*it);
-				std::cout << "\n+++++++ Сlient gone away! ++++++++\n\n";
-				printClients();
+                disconnectClient(*it);
 				break ;
 			}
 			_clients.at(*it)->appendMessageBuffer(_buf);
@@ -127,21 +133,25 @@ void Server::checkFds() {
 								perror("PONG err");
 							break;
 						}
+                        case MsgCmd_QUIT : {
+                            if (cmds.QUITCmd(*it, (*msg).params->toString()) == -1)
+                                perror("QUIT err");
+                            break;
+                        }
 						case MsgCmd__UNKNOWN : {
 							cmds.setReply(*it, ERR_UNKNOWNCOMMAND, ERR_UNKNOWNCOMMAND_MSG, (*msg).command->letters);
 							break;
 						}
 					}
 				}
-				_clients.at(*it)->clearMessageBuffer();
+                if (_clients.count(*it))
+				    _clients.at(*it)->clearMessageBuffer();
+                else
+                {
+                    _clients_fd.erase(*it);
+                    break;
+                }
 			}
-
-			// Отправим данные от клиента парсеру
-			// parser(*it, buf, bytes_read, 0); // (фд клиента, буфер с сообщением, размер сообщения)
-
-			// Parser *parser = new Parser(*this);
-			// parser->do_parsing(*it, _buf, bytes_read);
-
 		}
 		if (FD_ISSET(*it, &_writeset)) {
 			// Посмотрим буфер этого клиента, если есть, что ему писать, то отправим это ему, буфер очистим

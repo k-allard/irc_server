@@ -28,6 +28,7 @@ public:
 	//std::map<std::string, Channel*> _channels; // мапа каналов с ключом - названием канала
 
 	std::string getPass() {return this->_pass;};
+	int     disconnectClient(int fd);
 
 private:
 	void	initServer();
