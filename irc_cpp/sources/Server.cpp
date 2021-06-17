@@ -70,6 +70,7 @@ std::cout << "Our clients: ";
 void Server::checkFds() {
 	int					bytes_read		= 0;
 	struct sockaddr_in	address;		// структура для хранения адресов ipv4
+    Cmds cmds(*this);
 
 	bzero(_buf, 512);
 
@@ -98,13 +99,12 @@ void Server::checkFds() {
 			// Поступили данные от клиента, читаем их
 			if ((bytes_read = recv(*it, _buf, 512, 0)) <= 0) {
 				// Соединение разорвано, удаляем сокет из сета
-                disconnectClient(*it);
+				cmds.QUITCmd(*it, "Client disconnected");
 				break ;
 			}
 			_clients.at(*it)->appendMessageBuffer(_buf);
 			if(_clients.at(*it)->isMessageBufferComplete())
 			{
-				Cmds cmds(*this);
 				std::vector<Message> msgs = _parser->do_parsing(
 						*it,
 						_clients.at(*it)->messageBuf,
@@ -135,6 +135,11 @@ void Server::checkFds() {
 						}
                         case MsgCmd_QUIT : {
                             if (cmds.QUITCmd(*it, (*msg).params->toString()) == -1)
+                                perror("QUIT err");
+                            break;
+                        }
+                        case MsgCmd_PRIVMSG : {
+                            if (cmds.PRIVMSGCmd(*it, *msg) == -1)
                                 perror("QUIT err");
                             break;
                         }

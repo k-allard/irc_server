@@ -8,12 +8,8 @@ private:
 	struct sockaddr_in	        _address;
 	std::string			        _nick;
 	std::vector<std::string>    _userdata; //0 = username, 1 = host, 2 = server, 3 = real name
-	std::string                 _prefix;
 	bool                        _ispass; // отправлен ли правильный пароль (после PASS)
 	bool				        _isreg; // зарегистрирован ли клиент (только после NICK USER)
-
-	// Формула префикса для клиента: <nick>!<user>@<host>
-	void        setPrefix();
 
 public:
 	Client(int fd, struct sockaddr_in address);
@@ -48,7 +44,9 @@ public:
     const std::string   &getHost() {return this->_userdata[1];};
     const std::string   &getServer() {return this->_userdata[2];};
     const std::string   &getRealname() {return this->_userdata[3];};
+    // Формула префикса для клиента: <nick>!<user>@<host>
+    std::string        getPrefix();
     std::vector<std::string> *getUserdata() {return &this->_userdata;};
 
-    void                registr();
+    void                registr() {this->_isreg = true;};
 };

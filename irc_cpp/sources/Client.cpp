@@ -3,7 +3,6 @@
 Client::Client(int fd, struct sockaddr_in address) : _fd(fd), _address(address)
 {
 	this->_nick = "";
-	this->_prefix = "";
 	this->_isreg = false;
 	this->_ispass = false;
 
@@ -16,9 +15,9 @@ Client::Client(const Client &src)
 	*this = src;
 }
 
-void        Client::setPrefix()
+std::string        Client::getPrefix()
 {
-    _prefix += _nick + "!" + _userdata[0] + "@" + _userdata[1];
+    return (":" + _nick + "!" + _userdata[0] + "@" + _userdata[1]);
 }
 
 Client &Client::operator=(const Client &src)
@@ -36,12 +35,6 @@ Client &Client::operator=(const Client &src)
 
 Client::~Client()
 {
-}
-
-void    Client::registr()
-{
-    this->_isreg = true;
-    this->setPrefix();
 }
 
 void	Client::clearMessageBuffer()

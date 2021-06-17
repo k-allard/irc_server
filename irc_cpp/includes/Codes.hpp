@@ -28,7 +28,7 @@
 									//- Used to indicate the given channel name is invalid.
 
 //#define ERR_CANNOTSENDTOCHAN		404 //"<channel name> :Cannot send to channel"
-									//- Sent to a user who is either (a) not on a channel
+									//- Sent to a user who is either (a) not on a channelnullptr
 									// which is mode +n or (b) not a chanop (or mode +v) on
 									// a channel which has mode +m set and is trying to send
 									// a PRIVMSG message to that channel.
@@ -52,7 +52,8 @@
 //                   which is required since these commands must work
 //                   without valid prefixes.
 
-// #define         411     ERR_NORECIPIENT // ":No recipient given (<command>)"
+#define ERR_NORECIPIENT 411      // ":No recipient given (<command>)"
+#define ERR_NORECIPIENT_MSG ":No recipient given (<command>)"
 #define ERR_NOTEXTTOSEND 412 // ":No text to send"
 #define ERR_NOTEXTTOSEND_MSG ":No text to send"
 // #define         413     ERR_NOTOPLEVEL // "<mask> :No toplevel domain specified"

@@ -68,7 +68,6 @@ int		Cmds::setReply(int fd, int code, std::string mess, std::string args)
 	return 0;
 }
 
-//TODO C++11 extension!!!
 int		Cmds::checkNick(std::string nick)
 {
 	if(nick.size() > 9)
@@ -180,7 +179,7 @@ int		Cmds::QUITCmd(int fd, std::string args)
 {
     writeToBuf(fd, "ERROR Closing Link");
     _server.disconnectClient(fd);
-    // отправить команнду QUIT всем каналам в которых был этот юзер с аргументом (если не дан то ник)
+    // TODO отправить команнду QUIT всем каналам в которых был этот юзер с аргументом (если не дан то ник)
 	return 0;
 }
 
@@ -195,9 +194,20 @@ int		Cmds::MOTDCmd(int fd, std::string args)
 	return 0;
 }
 
-int		Cmds::PRIVMSGCmd(int fd, std::string args)
+int		Cmds::PRIVMSGCmd(int fd, Message msg)
 {
-
+    if(msg.params->Params.empty())
+        return setReply(fd, ERR_NORECIPIENT, ERR_NORECIPIENT_MSG, "");
+    if(msg.params->Params.size() == 1)
+        return setReply(fd, ERR_NOTEXTTOSEND, ERR_NOTEXTTOSEND_MSG, "");
+    Client *client = findClient(fd);
+    std::vector<std::string>::iterator it = msg.params->Params.begin();
+    Client *recip =findClientNick(*it);
+    //TODO добавить поиск по каналам
+    if(recip == NULL)
+        return setReply(fd, ERR_NOSUCHNICK, ERR_NOSUCHNICK_MSG, "");
+    //TODO отправлять только один аргумент сообщения
+    writeToBuf(recip->getFd(), client->getPrefix() + " PRIVMSG " + msg.params->toString());
 	return 0;
 }
 
