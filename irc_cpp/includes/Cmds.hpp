@@ -2,6 +2,7 @@
 #include "header.hpp"
 #include "Client.hpp"
 #include "Codes.hpp"
+#include "Message.hpp"
 
 class Cmds
 {
@@ -28,7 +29,7 @@ public:
 	int		QUITCmd(int fd, std::string args);
 	int		PARTCmd(int fd, std::string args);
 	int		MOTDCmd(int fd, std::string args);
-	int		PRIVMSGCmd(int fd, std::string args);
+	int		PRIVMSGCmd(int fd, Message msg);
 	int		MODECmd(int fd, std::string args);
 	int		KICKCmd(int fd, std::string args);
 	int		LUSERCmd(int fd, std::string args);
