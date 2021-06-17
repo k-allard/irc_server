@@ -11,18 +11,14 @@
  */
 class MessageCommand {
 public:
-
-	MessageCommand(int numbers);
-	MessageCommand(std::string::const_iterator &it, const std::string::const_iterator &end);
-	MessageCommand(std::string string);
-	MessageCommand(char *string);
+	MessageCommand(std::string::iterator &it, const std::string::iterator &end);
 	~MessageCommand();
 
 	std::string letters;
 	int numbers;
 	MessageCommandEnum cmdType;
 private:
-	std::string getLetters(std::string::const_iterator &it, const std::string::const_iterator &end);
+	std::string getLettersOrSetNumbers(std::string::iterator &it, const std::string::iterator &end);
 	MessageCommandEnum str2enum(std::string &string);
 
 };
