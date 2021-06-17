@@ -24,7 +24,7 @@ public:
 	Client *findClient(int fd); // Ишет инстанс клиента по fd
 
 	int		NICKCmd(int fd, std::string args);
-	int		PASSCmd(int fd, std::string args);
+	int		PASSCmd(int fd, Message msg);
 	int		JOINCmd(int fd, std::string args);
 	int		QUITCmd(int fd, std::string args);
 	int		PARTCmd(int fd, std::string args);

@@ -115,21 +115,14 @@ int		Cmds::NICKCmd(int fd, std::string args)
 	return 0;
 }
 
-int		Cmds::PASSCmd(int fd, std::string args)
+int		Cmds::PASSCmd(int fd, Message msg)
 {
 	Client *client = findClient(fd);
-	if (client == NULL)
-	{
-		perror("client not found");
-		return -1;
-	}
 	if(client->isPass())
 		return setReply(fd, ERR_ALREADYREGISTRED, ERR_ALREADYREGISTRED_MSG, "");
-	if(args.empty())
+	if(msg.params->Params.empty())
 		return setReply(fd, ERR_NEEDMOREPARAMS, ERR_NEEDMOREPARAMS_MSG, "PASS");
-	if(args[0] == ':')
-        args.erase(args.begin());
-	if(args == _server.getPass())
+	if(msg.params->Params[0] == _server.getPass())
 	    client->setPass();
 	return 0;
 }
@@ -207,7 +200,7 @@ int		Cmds::PRIVMSGCmd(int fd, Message msg)
     if(recip == NULL)
         return setReply(fd, ERR_NOSUCHNICK, ERR_NOSUCHNICK_MSG, "");
     //TODO отправлять только один аргумент сообщения
-    writeToBuf(recip->getFd(), client->getPrefix() + " PRIVMSG " + msg.params->toString());
+    writeToBuf(recip->getFd(), client->getPrefix() + " PRIVMSG " + recip->getNick() + " :" + msg.params->Params[1]);
 	return 0;
 }
 

@@ -119,7 +119,7 @@ void Server::checkFds() {
 							break;
 						}
 						case MsgCmd_PASS : {
-							if (cmds.PASSCmd(*it, (*msg).params->toString()) == -1)
+							if (cmds.PASSCmd(*it, *msg) == -1)
 								perror("PASS err");
 							break;
 						}

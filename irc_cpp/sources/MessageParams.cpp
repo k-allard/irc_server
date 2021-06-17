@@ -40,7 +40,7 @@ MessageParams::MessageParams(std::string::const_iterator &it, const std::string:
     }
     if(trailing != "")
     {
-        trailing.erase(0, 1);
+        trailing.erase(0, 2);
         this->Params.push_back(trailing);
     }
 }
