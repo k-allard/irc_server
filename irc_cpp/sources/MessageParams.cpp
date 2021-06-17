@@ -23,14 +23,26 @@
 MessageParams::MessageParams(std::string::const_iterator &it, const std::string::const_iterator &end)
 {
 	std::string str(it, end);
-	std::istringstream stream(str);
-	std::string tmp;
-	while (std::getline(stream, tmp, ' ')) {
-		if(tmp.empty())
-			continue;
-		//tmp.erase(tmp.size() - 1, 1);
-		this->Params.push_back(tmp);
-	}
+    std::string trailing_delimiter = " :";
+    std::string middle = str.substr(0, str.find(trailing_delimiter));
+    std::string trailing = str.substr(middle.length(), str.length());
+
+    if(middle != "")
+    {
+        std::istringstream stream(middle);
+        std::string tmp;
+        while (std::getline(stream, tmp, ' ')) {
+            if(tmp.empty())
+                continue;
+            //tmp.erase(tmp.size() - 1, 1);
+            this->Params.push_back(tmp);
+        }
+    }
+    if(trailing != "")
+    {
+        trailing.erase(0, 1);
+        this->Params.push_back(trailing);
+    }
 }
 
 std::string MessageParams::toString() {
