@@ -99,7 +99,7 @@ void Server::checkFds() {
 			// Поступили данные от клиента, читаем их
 			if ((bytes_read = recv(*it, _buf, 512, 0)) <= 0) {
 				// Соединение разорвано, удаляем сокет из сета
-				cmds.QUITCmd(*it, "Client disconnected");
+				cmds.QUITCmd(*it, "");
 				break ;
 			}
 			_clients.at(*it)->appendMessageBuffer(_buf);
@@ -114,7 +114,7 @@ void Server::checkFds() {
 				{
 					switch ((*msg).command->cmdType) {
 						case MsgCmd_NICK : {
-							if (cmds.NICKCmd(*it, (*msg).params->toString()) == -1)
+							if (cmds.NICKCmd(*it, *msg) == -1)
 								perror("NICK err");
 							break;
 						}
@@ -124,12 +124,12 @@ void Server::checkFds() {
 							break;
 						}
 						case MsgCmd_USER : {
-							if (cmds.USERCmd(*it, (*msg).params->toString()) == -1)
+							if (cmds.USERCmd(*it, *msg) == -1)
 								perror("USER err");
 							break;
 						}
 						case MsgCmd_PING : {
-							if (cmds.PONGCmd(*it, (*msg).params->toString()) == -1)
+							if (cmds.PONGCmd(*it, *msg) == -1)
 								perror("PONG err");
 							break;
 						}
@@ -140,7 +140,7 @@ void Server::checkFds() {
                         }
                         case MsgCmd_PRIVMSG : {
                             if (cmds.PRIVMSGCmd(*it, *msg) == -1)
-                                perror("QUIT err");
+                                perror("PRIVMSG err");
                             break;
                         }
 						case MsgCmd__UNKNOWN : {

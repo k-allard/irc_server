@@ -33,11 +33,6 @@ void            Cmds::regClient(int fd)
 int		Cmds::writeToBuf(int fd, std::string mess)
 {
 	Client *client = findClient(fd);
-	if (client == NULL)
-	{
-		perror("client not found");
-		return -1;
-	}
 	mess += "\r\n";
 	client->_buf.push(mess);
 	return 1;
@@ -93,31 +88,26 @@ Client *Cmds::findClientNick(const std::string& nick)
 	return NULL;
 }
 
-int		Cmds::NICKCmd(int fd, std::string args)
+int		Cmds::NICKCmd(int fd, const Message& msg)
 {
 	Client *client = findClient(fd);
-	if (client == NULL)
-	{
-		perror("client not found");
-		return -1;
-	}
 	if(!client->isPass())
 		return setReply(fd, ERR_NOTREGISTERED, ERR_NOTREGISTERED_MSG, "");
-	if(args.empty())
+	if(msg.params->Params.empty())
 		return setReply(fd, ERR_NONICKNAMEGIVEN, ERR_NONICKNAMEGIVEN_MSG, "");
-	if(checkNick(args) == 0)
-		return setReply(fd, ERR_ERRONEUSNICKNAME, ERR_ERRONEUSNICKNAME_MSG, args);
-	if(findClientNick(args) != NULL)
-        return setReply(fd, ERR_NICKNAMEINUSE, ERR_NICKNAMEINUSE_MSG, args);
+	if(checkNick(msg.params->Params[0]) == 0)
+		return setReply(fd, ERR_ERRONEUSNICKNAME, ERR_ERRONEUSNICKNAME_MSG, msg.params->Params[0]);
+	if(findClientNick(msg.params->Params[0]) != NULL)
+        return setReply(fd, ERR_NICKNAMEINUSE, ERR_NICKNAMEINUSE_MSG, msg.params->Params[0]);
 	else {
-        client->setNick(args);
-        if (!client->getUserdata()->empty())
+        client->setNick(msg.params->Params[0]);
+        if (!client->getUserdata()->empty() && !client->isReg())
             regClient(fd);
     }
 	return 0;
 }
 
-int		Cmds::PASSCmd(int fd, Message msg)
+int		Cmds::PASSCmd(int fd, const Message& msg)
 {
 	Client *client = findClient(fd);
 	if(client->isPass())
@@ -129,7 +119,7 @@ int		Cmds::PASSCmd(int fd, Message msg)
 	return 0;
 }
 
-int		Cmds::USERCmd(int fd, std::string args)
+int		Cmds::USERCmd(int fd, const Message& msg)
 {
 	Client *client = findClient(fd);
 	if (client == NULL)
@@ -141,36 +131,21 @@ int		Cmds::USERCmd(int fd, std::string args)
 		return setReply(fd, ERR_NOTREGISTERED, ERR_NOTREGISTERED_MSG, "");
 	if(client->isReg())
 		return setReply(fd, ERR_ALREADYREGISTRED, ERR_ALREADYREGISTRED_MSG, "");
-	if(args.empty())
+	if(msg.params->Params.empty() || msg.params->Params.size() < 4)
 		return setReply(fd, ERR_NEEDMOREPARAMS, ERR_NEEDMOREPARAMS_MSG, "USER");
-
-	// TODO Вывести в отдельную функцию
-	std::istringstream stream(args);
-	std::vector<std::string> data;
-	std::string tmp;
-	while (std::getline(stream, tmp, ' ')) {
-		if(tmp.empty())
-			continue;
-		data.push_back(tmp);
-		if (data.size() == 4)
-			break ;
-	}
-	if (data.size() < 4)
-		return setReply(fd, ERR_NEEDMOREPARAMS, ERR_NEEDMOREPARAMS_MSG, "USER");
-
-	client->setUserdata(data);
+	client->setUserdata(msg.params->Params);
 	if(!client->getNick().empty())
         regClient(fd);
 	return 0;
 }
 
 // JOIN #here, #there 123
-int		Cmds::JOINCmd(int fd, std::string args)
+int		Cmds::JOINCmd(int fd, const Message& msg)
 {
 	return 0;
 }
 
-int		Cmds::QUITCmd(int fd, std::string args)
+int		Cmds::QUITCmd(int fd, const std::string& msg)
 {
     writeToBuf(fd, "ERROR Closing Link");
     _server.disconnectClient(fd);
@@ -179,17 +154,17 @@ int		Cmds::QUITCmd(int fd, std::string args)
 }
 
 //PART #here, :#there zzz
-int		Cmds::PARTCmd(int fd, std::string args)
+int		Cmds::PARTCmd(int fd, const Message& msg)
 {
 	return 0;
 }
 
-int		Cmds::MOTDCmd(int fd, std::string args)
+int		Cmds::MOTDCmd(int fd, const Message& msg)
 {
 	return 0;
 }
 
-int		Cmds::PRIVMSGCmd(int fd, Message msg)
+int		Cmds::PRIVMSGCmd(int fd, const Message& msg)
 {
     if(msg.params->Params.empty())
         return setReply(fd, ERR_NORECIPIENT, ERR_NORECIPIENT_MSG, "");
@@ -201,33 +176,32 @@ int		Cmds::PRIVMSGCmd(int fd, Message msg)
     //TODO добавить поиск по каналам
     if(recip == NULL)
         return setReply(fd, ERR_NOSUCHNICK, ERR_NOSUCHNICK_MSG, "");
-    //TODO отправлять только один аргумент сообщения
     writeToBuf(recip->getFd(), client->getPrefix() + " PRIVMSG " + recip->getNick() + " :" + msg.params->Params[1]);
 	return 0;
 }
 
-int		Cmds::MODECmd(int fd, std::string args)
+int		Cmds::MODECmd(int fd, const Message& msg)
 {
 	return 0;
 }
 
-int		Cmds::KICKCmd(int fd, std::string args)
+int		Cmds::KICKCmd(int fd, const Message& msg)
 {
 	return 0;
 }
 
-int		Cmds::LUSERCmd(int fd, std::string args)
+int		Cmds::LUSERCmd(int fd, const Message& msg)
 {
 	return 0;
 }
 
-int		Cmds::USERSCmd(int fd, std::string args)
+int		Cmds::USERSCmd(int fd, const Message& msg)
 {
 	return 0;
 }
 
-int		Cmds::PONGCmd(int fd, std::string args)
+int		Cmds::PONGCmd(int fd, const Message& msg)
 {
-    writeToBuf(fd, "PONG " + args);
+    writeToBuf(fd, "PONG " + msg.params->Params[0]);
     return 0;
 }
