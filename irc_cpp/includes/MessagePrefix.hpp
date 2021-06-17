@@ -14,6 +14,6 @@ public:
 	std::string user;
 	std::string host;
 
-	MessagePrefix(std::string::const_iterator &it, const std::string::const_iterator &end);
+	MessagePrefix(std::string::iterator &it, const std::string::iterator &end);
 
 };
