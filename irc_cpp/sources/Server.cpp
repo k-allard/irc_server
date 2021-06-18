@@ -67,6 +67,65 @@ std::cout << "Our clients: ";
 		std::cout << std::endl << std::endl;
 }
 
+void Server::checkPerror(int code, const char* errorMessage)
+{
+    if (code == -1)
+        perror(errorMessage);
+}
+
+void Server::processMessage(const Message *msg, int fd, Client *client, Cmds *cmds) {
+    if(client->isReg()) {
+        switch (msg->command->cmdType) {
+            case MsgCmd_NICK : {
+                checkPerror (cmds->NICKCmd(fd, *msg), "NICK err");
+                break;
+            }
+            case MsgCmd_PASS : {
+                checkPerror (cmds->PASSCmd(fd, *msg), "PASS err");
+                break;
+            }
+            case MsgCmd_USER : {
+                checkPerror (cmds->USERCmd(fd, *msg), "USER err");
+                break;
+            }
+            case MsgCmd_PING : {
+                checkPerror (cmds->PONGCmd(fd, *msg), "PONG err");
+                break;
+            }
+            case MsgCmd_QUIT : {
+                checkPerror (cmds->QUITCmd(fd, (*msg).params->toString()), "QUIT err");
+                break;
+            }
+            case MsgCmd_PRIVMSG : {
+                checkPerror (cmds->PRIVMSGCmd(fd, *msg), "PRIVMSG err");
+                break;
+            }
+            default: {
+                cmds->setReply(fd, ERR_UNKNOWNCOMMAND, ERR_UNKNOWNCOMMAND_MSG, msg->command->letters);
+                break;
+            }
+        }
+    } else {
+        switch (msg->command->cmdType) {
+            case MsgCmd_NICK : {
+                checkPerror (cmds->NICKCmd(fd, *msg), "NICK err");
+                break;
+            }
+            case MsgCmd_PASS : {
+                checkPerror (cmds->PASSCmd(fd, *msg), "PASS err");
+                break;
+            }
+            case MsgCmd_USER : {
+                checkPerror (cmds->USERCmd(fd, *msg), "USER err");
+                break;
+            }
+            default: {
+                break;
+            }
+        }
+    }
+}
+
 void Server::checkFds() {
 	int					bytes_read		= 0;
 	struct sockaddr_in	address;		// структура для хранения адресов ipv4
@@ -112,43 +171,9 @@ void Server::checkFds() {
 				// temParser(*it, _clients.at(*it)->messageBuf, _clients.at(*it)->_messageBufLength);
 				for (std::vector<Message>::const_iterator msg = msgs.begin(); msg != msgs.end(); ++msg)
 				{
-					switch ((*msg).command->cmdType) {
-						case MsgCmd_NICK : {
-							if (cmds.NICKCmd(*it, *msg) == -1)
-								perror("NICK err");
-							break;
-						}
-						case MsgCmd_PASS : {
-							if (cmds.PASSCmd(*it, *msg) == -1)
-								perror("PASS err");
-							break;
-						}
-						case MsgCmd_USER : {
-							if (cmds.USERCmd(*it, *msg) == -1)
-								perror("USER err");
-							break;
-						}
-						case MsgCmd_PING : {
-							if (cmds.PONGCmd(*it, *msg) == -1)
-								perror("PONG err");
-							break;
-						}
-                        case MsgCmd_QUIT : {
-                            if (cmds.QUITCmd(*it, (*msg).params->toString()) == -1)
-                                perror("QUIT err");
-                            break;
-                        }
-                        case MsgCmd_PRIVMSG : {
-                            if (cmds.PRIVMSGCmd(*it, *msg) == -1)
-                                perror("PRIVMSG err");
-                            break;
-                        }
-						case MsgCmd__UNKNOWN : {
-							if (_clients.at(*it)->isReg())
-								cmds.setReply(*it, ERR_UNKNOWNCOMMAND, ERR_UNKNOWNCOMMAND_MSG, (*msg).command->letters);
-							break;
-						}
-					}
+                    this->processMessage(&(*msg), *it, _clients.at(*it), &cmds);
+
+
 				}
                 if (_clients.count(*it))
 				    _clients.at(*it)->clearMessageBuffer();

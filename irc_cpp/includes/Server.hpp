@@ -1,10 +1,5 @@
 #pragma once
 #include "header.hpp"
-#include "Client.hpp"
-#include "Channel.hpp"
-#include "Cmds.hpp"
-#include "Parser.hpp"
-
 
 class Server
 {
@@ -35,6 +30,8 @@ private:
 	void	initFds();
 	void	doSelect();
 	void	checkFds();
+    void    checkPerror(int code, const char* errorMessage);
+	void    processMessage(const Message *msg, int fd, Client *client, Cmds *cmds);
 
 	//********************//
 	//  f o r _ d e b u g //
@@ -42,4 +39,3 @@ private:
 	void	printClients();
 	void	temParser(int fd, char *buf, int size);
 };
-
