@@ -74,54 +74,36 @@ void Server::checkPerror(int code, const char* errorMessage)
 }
 
 void Server::processMessage(const Message *msg, int fd, Client *client, Cmds *cmds) {
-    if(client->isReg()) {
-        switch (msg->command->cmdType) {
-            case MsgCmd_NICK : {
-                checkPerror (cmds->NICKCmd(fd, *msg), "NICK err");
-                break;
-            }
-            case MsgCmd_PASS : {
-                checkPerror (cmds->PASSCmd(fd, *msg), "PASS err");
-                break;
-            }
-            case MsgCmd_USER : {
-                checkPerror (cmds->USERCmd(fd, *msg), "USER err");
-                break;
-            }
-            case MsgCmd_PING : {
-                checkPerror (cmds->PONGCmd(fd, *msg), "PONG err");
-                break;
-            }
-            case MsgCmd_QUIT : {
-                checkPerror (cmds->QUITCmd(fd, (*msg).params->toString()), "QUIT err");
-                break;
-            }
-            case MsgCmd_PRIVMSG : {
-                checkPerror (cmds->PRIVMSGCmd(fd, *msg), "PRIVMSG err");
-                break;
-            }
-            default: {
-                cmds->setReply(fd, ERR_UNKNOWNCOMMAND, ERR_UNKNOWNCOMMAND_MSG, msg->command->letters);
-                break;
-            }
+    switch (msg->command->cmdType) {
+        case MsgCmd_NICK : {
+            checkPerror (cmds->NICKCmd(fd, *msg), "NICK err");
+            break;
         }
-    } else {
-        switch (msg->command->cmdType) {
-            case MsgCmd_NICK : {
-                checkPerror (cmds->NICKCmd(fd, *msg), "NICK err");
-                break;
+        case MsgCmd_PASS : {
+            checkPerror (cmds->PASSCmd(fd, *msg), "PASS err");
+            break;
+        }
+        case MsgCmd_USER : {
+            checkPerror (cmds->USERCmd(fd, *msg), "USER err");
+            break;
+        }
+        case MsgCmd_PING : {
+            checkPerror (cmds->PONGCmd(fd, *msg), "PONG err");
+            break;
+        }
+        case MsgCmd_QUIT : {
+            checkPerror (cmds->QUITCmd(fd, (*msg).params->toString()), "QUIT err");
+            break;
+        }
+        case MsgCmd_PRIVMSG : {
+            checkPerror (cmds->PRIVMSGCmd(fd, *msg), "PRIVMSG err");
+            break;
+        }
+        default: {
+            if(client->isReg()) {
+                cmds->setReply(fd, ERR_UNKNOWNCOMMAND, ERR_UNKNOWNCOMMAND_MSG, msg->command->letters);
             }
-            case MsgCmd_PASS : {
-                checkPerror (cmds->PASSCmd(fd, *msg), "PASS err");
-                break;
-            }
-            case MsgCmd_USER : {
-                checkPerror (cmds->USERCmd(fd, *msg), "USER err");
-                break;
-            }
-            default: {
-                break;
-            }
+            break;
         }
     }
 }
