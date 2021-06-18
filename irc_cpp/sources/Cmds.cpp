@@ -51,7 +51,9 @@ int		Cmds::setReply(int fd, int code, std::string mess, std::string args)
 		perror("client not found");
 		return -1;
 	}
-	res += ":ircserv.net " + std::to_string(code); // С++11
+    std::ostringstream ss;
+    ss << code;
+    res += ":ircserv.net " + ss.str(); // С++98
 	if(!client->getNick().empty())
 		res += " " + client->getNick();
 	else

@@ -21,7 +21,7 @@
  * @param it
  * @param end
  */
-MessagePrefix::MessagePrefix(std::string::const_iterator &it, const std::string::const_iterator &end)
+MessagePrefix::MessagePrefix(std::string::iterator &it, const std::string::iterator &end)
 {
 	if(it < end && *it == ':')
 	{

@@ -20,9 +20,9 @@
  * @see <A HREF="https://datatracker.ietf.org/doc/html/rfc1459#section-2.3.1">2.3.1 Message format in 'pseudo' BNF</A>
  */
 
-MessageParams::MessageParams(std::string::const_iterator &it, const std::string::const_iterator &end)
+MessageParams::MessageParams(std::string::iterator &it, const std::string::iterator &end)
 {
-	std::string str(it, end);
+    std::string str(it, end);
     std::string trailing_delimiter = " :";
     std::string middle = str.substr(0, str.find(trailing_delimiter));
     std::string trailing = str.substr(middle.length(), str.length());
@@ -34,7 +34,6 @@ MessageParams::MessageParams(std::string::const_iterator &it, const std::string:
         while (std::getline(stream, tmp, ' ')) {
             if(tmp.empty())
                 continue;
-            //tmp.erase(tmp.size() - 1, 1);
             this->Params.push_back(tmp);
         }
     }
@@ -46,7 +45,6 @@ MessageParams::MessageParams(std::string::const_iterator &it, const std::string:
 }
 
 std::string MessageParams::toString() {
-	// print something from v to str, e.g: Str << v.getX();
 	std::string str("");
 
 	for (std::vector<std::string>::const_iterator i = this->Params.begin(); i != this->Params.end(); ++i)
