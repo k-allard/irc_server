@@ -13,7 +13,7 @@ private:
 public:
 	Channel(int operator_fd, Server &server) : _operator_fd (operator_fd), _server(server) {
 		_participants_fds.insert(operator_fd);
-		_topic = "Discuss everything!";
+		_topic = "";
 	};
 	~Channel() { };
 

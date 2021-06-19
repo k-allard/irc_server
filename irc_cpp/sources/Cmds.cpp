@@ -218,7 +218,8 @@ int		Cmds::JOINCmd(int fd, const Message& msg)
 		}
 
 		// отправили ему топик канала
-		setReply(fd, RPL_TOPIC, RPL_TOPIC_MSG, channelName, _server._channels[channelName]->getTopic());
+		if (_server._channels[channelName]->getTopic())
+			setReply(fd, RPL_TOPIC, RPL_TOPIC_MSG, channelName, _server._channels[channelName]->getTopic());
 
 		// отправили ему список участников каналов + конечное сообщение
 		setReply(fd, RPL_NAMREPLY, RPL_NAMREPLY_MSG, channelName, _server._channels[channelName]->getParticipantsNames());
