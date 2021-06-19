@@ -23,6 +23,7 @@ public:
 
 	int		setReply(int fd, int code, std::string mess, std::string arg1, std::string arg2); // создает сообщение по коду ошибки и отправляет его в writeToBuf
 	int		writeToBuf(int fd, std::string mess); //Записать сообщение в буфер клиента для отправки
+	int		isChannelNameCorrect(std::string name);
 	int		NICKCmd(int fd, const Message& msg);
 	int		PASSCmd(int fd, const Message& msg);
 	int		JOINCmd(int fd, const Message& msg);
@@ -36,4 +37,5 @@ public:
 	int		USERCmd(int fd, const Message& msg);
 	int		USERSCmd(int fd, const Message& msg);
     int		PONGCmd(int fd, const Message& msg);
+
 };

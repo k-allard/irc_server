@@ -14,7 +14,7 @@ std::string Channel::getParticipantsNames() {
 
 void Channel::addParticipant(int fd) { _participants_fds.insert(fd); }
 
-std::set<int> Channel::getParticipantsFds() { return _participants_fds; }
+std::set<int> *Channel::getParticipantsFds() { return &_participants_fds; }
 
 // всем в этом канале разослать mess
 void Channel::sendMessToAll(std::string mess) {

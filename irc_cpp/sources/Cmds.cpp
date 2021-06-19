@@ -206,11 +206,17 @@ int		Cmds::JOINCmd(int fd, const Message& msg)
 	Client *client = findClient(fd);
 
 	if (_server._channels.find(channelName) != _server._channels.end()) { // 	такой канал у нас есть
-		// добвить в учатников канала
+		// добвить в учатников канала, если он еще не там
+		std::set<int>::iterator it;
+		it = _server._channels[channelName]->getParticipantsFds()->find(fd);
+		if (it != _server._channels[channelName]->getParticipantsFds()->end()) {
+			std::cout << "D E B U G: не добавить в учаcтников канала, он уже там" << std::endl;
+			return setReply(fd, ERR_USERONCHANNEL, ERR_USERONCHANNEL_MSG, client->getNick(), channelName);
+		}
+		std::cout << "D E B U G: добавить в учаcтников канала, он еще не там" << std::endl;
 		_server._channels[channelName]->addParticipant(fd);
-
 		// всем в этом канале (кроме его самого) разослать :<client prefix> JOIN <channel name>
-		for (std::set<int>::iterator it=_server._channels[channelName]->getParticipantsFds().begin(); it!=_server._channels[channelName]->getParticipantsFds().end(); ++it) {
+		for (std::set<int>::iterator it=_server._channels[channelName]->getParticipantsFds()->begin(); it!=_server._channels[channelName]->getParticipantsFds()->end(); ++it) {
 			if (*it != fd)
 				writeToBuf(*it, ":" + client->getPrefix() + " JOIN " + channelName);
 			else
@@ -218,7 +224,7 @@ int		Cmds::JOINCmd(int fd, const Message& msg)
 		}
 
 		// отправили ему топик канала
-		if (_server._channels[channelName]->getTopic())
+		if (!_server._channels[channelName]->getTopic().empty())
 			setReply(fd, RPL_TOPIC, RPL_TOPIC_MSG, channelName, _server._channels[channelName]->getTopic());
 
 		// отправили ему список участников каналов + конечное сообщение
@@ -226,12 +232,41 @@ int		Cmds::JOINCmd(int fd, const Message& msg)
 		setReply(fd, RPL_ENDOFNAMES, RPL_ENDOFNAMES_MSG, "", "");
 	}
 
-	else {
-//такого канала нет надо создать и его туда добавить
+	else { //такого канала нет надо создать и его туда добавить
+		std::cout << "D E B U G: создать канал и добвить в учаcтников создателя" << std::endl;
+		if (!isChannelNameCorrect(channelName)) {
+			std::cout << "D E B U G: некорректное имя канала, выходим из джойна" << std::endl;
+			return -1;
+		}
+		std::cout << "D E B U G: корректное имя канала, создаем" << std::endl;
+
+		Channel *newChannel = new Channel(fd, _server);
+
+		std::pair<std::map<std::string, Channel*>::iterator,bool> ret;
+		ret = _server._channels.insert( std::pair<std::string, Channel*>(channelName,newChannel) );
+		if (ret.second == false) { 	//channel not inserted
+			return setReply(fd, ERR_BADCHANNELKEY, ERR_BADCHANNELKEY_MSG, channelName, "");
+		}
+
 	}
 
 
 	return 0;
+}
+
+int Cmds::isChannelNameCorrect(std::string name) {
+	if ((name.at(0) != '#') || (name.find(' ') != std::string::npos) || (name.length() > 50)) {
+		std::cout << "D E B U G: неправильно!" << std::endl;
+		return 0;
+	}
+	for (int i = 1; i < name.length(); i++) {
+		char ch = name.at(i);
+		if (ch < 48 || (ch > 57 && ch < 65) || (ch > 90 && ch < 97) || ch > 122) {
+			std::cout << "D E B U G: символ [" << ch << "] неправильный" << std::endl;
+			return 0;
+		}
+	}
+	return 1;
 }
 
 int		Cmds::QUITCmd(int fd, const std::string& msg)

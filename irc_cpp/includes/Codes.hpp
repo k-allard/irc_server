@@ -119,7 +119,8 @@
 //                   perform a channel effecting command for which the
 //                   client isn't a member.
 
-// #define         443     ERR_USERONCHANNEL // "<user> <channel> :is already on channel"
+ #define              ERR_USERONCHANNEL 443
+ #define              ERR_USERONCHANNEL_MSG "<user> <channel> :is already on channel"
 //                 - Returned when a client tries to invite a user to a
 //                   channel they are already on.
 
@@ -175,7 +176,8 @@
 // #define         472     ERR_UNKNOWNMODE // "<char> :is unknown mode char to me"
 // #define         473     ERR_INVITEONLYCHAN // "<channel> :Cannot join channel (+i)"
 // #define         474     ERR_BANNEDFROMCHAN // "<channel> :Cannot join channel (+b)"
-// #define         475     ERR_BADCHANNELKEY // "<channel> :Cannot join channel (+k)"
+ #define              ERR_BADCHANNELKEY 475
+#define              ERR_BADCHANNELKEY_MSG "<channel> :Cannot join channel (+k)"
 // #define         481     ERR_NOPRIVILEGES // ":Permission Denied- You're not an IRC operator"
 //                 - Any command requiring operator privileges to operate
 //                   must return this error to indicate the attempt was
