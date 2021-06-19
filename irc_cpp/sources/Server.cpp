@@ -79,6 +79,10 @@ void Server::processMessage(const Message *msg, int fd, Client *client, Cmds *cm
             checkPerror (cmds->NICKCmd(fd, *msg), "NICK err");
             break;
         }
+		case MsgCmd_JOIN : {
+			checkPerror (cmds->JOINCmd(fd, *msg), "JOIN err");
+			break;
+		}
         case MsgCmd_PASS : {
             checkPerror (cmds->PASSCmd(fd, *msg), "PASS err");
             break;
@@ -101,7 +105,7 @@ void Server::processMessage(const Message *msg, int fd, Client *client, Cmds *cm
         }
         default: {
             if(client->isReg()) {
-                cmds->setReply(fd, ERR_UNKNOWNCOMMAND, ERR_UNKNOWNCOMMAND_MSG, msg->command->letters);
+                cmds->setReply(fd, ERR_UNKNOWNCOMMAND, ERR_UNKNOWNCOMMAND_MSG, msg->command->letters, "");
             }
             break;
         }

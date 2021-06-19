@@ -1,4 +1,9 @@
 #pragma once
+// ****** FOR  TESTING!!!!!! ****** //
+#define RPL_TESTING                 999 //"This server was created <date>"
+#define RPL_TESTING_MSG             ":Hello! Your socket is #<id>. This server is created by <authors>"
+// ****** ****************** ****** //
+
 
 #define RPL_WELCOME                 001
 #define RPL_WELCOME_MSG             ":Welcome to the Internet Relay Network <nick>!<user>@<host>"
@@ -333,10 +338,10 @@
 //                   after processing each list item with <name> being
 //                   the item.
 
-// #define         353     RPL_NAMREPLY
+// #define              RPL_NAMREPLY 353
 //                         "<channel> :[[@|+]<nick> [[@|+]<nick> [...]]]"
-// #define         366     RPL_ENDOFNAMES
-//                         "<channel> :End of /NAMES list"
+ #define              RPL_ENDOFNAMES 366
+#define 				RPL_ENDOFNAMES_MSG ":End of /NAMES list"
 
 //                 - To reply to a NAMES message, a reply pair consisting
 //                   of RPL_NAMREPLY and RPL_ENDOFNAMES is sent by the

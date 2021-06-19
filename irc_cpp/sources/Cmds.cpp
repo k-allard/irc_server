@@ -24,10 +24,10 @@ void            Cmds::regClient(int fd)
     Client *client = findClient(fd);
 
     client->registr();
-    setReply(fd, RPL_WELCOME, RPL_WELCOME_MSG, "");
-    setReply(fd, RPL_YOURHOST, RPL_YOURHOST_MSG, "");
-    setReply(fd, RPL_CREATED, RPL_CREATED_MSG, "");
-    setReply(fd, RPL_MYINFO, RPL_MYINFO_MSG, "");
+    setReply(fd, RPL_WELCOME, RPL_WELCOME_MSG, "", "");
+    setReply(fd, RPL_YOURHOST, RPL_YOURHOST_MSG, "", "");
+    setReply(fd, RPL_CREATED, RPL_CREATED_MSG, "", "");
+    setReply(fd, RPL_MYINFO, RPL_MYINFO_MSG, "", "");
 }
 
 int		Cmds::writeToBuf(int fd, std::string mess)
@@ -42,8 +42,32 @@ int		Cmds::writeToBuf(int fd, std::string mess)
 // Префикс с названием хоста + код ошибки в формате трехзначного числа + ник получателя (если нет то *) + аргументы полученой команды (если есть) + сообщение по коду
 // Пример: ":irc.example.com 001 borja :Welcome to the Internet Relay Network borja!borja@polaris.cs.uchicago.edu"
 
-int		Cmds::setReply(int fd, int code, std::string mess, std::string args)
+//int		Cmds::setReply(int fd, int code, std::string mess, std::string args)
+//{
+//	std::string res;
+//	Client *client = findClient(fd);
+//	if (client == NULL)
+//	{
+//		perror("client not found");
+//		return -1;
+//	}
+//    std::ostringstream ss;
+//    ss << code;
+//    res += ":ircserv.net " + ss.str(); // С++98
+//	if(!client->getNick().empty())
+//		res += " " + client->getNick();
+//	else
+//		res += " *";
+//	if(!args.empty())
+//		res += " " + args;
+//	res += " " + mess;
+//	writeToBuf(fd, res);
+//	return 0;
+//}
+
+int		Cmds::setReply(int fd, int code, std::string mess, std::string arg1, std::string arg2)
 {
+	std::cout << "Received args! [" << arg1 << "] [" << arg2 << "]" << std::endl;
 	std::string res;
 	Client *client = findClient(fd);
 	if (client == NULL)
@@ -51,15 +75,48 @@ int		Cmds::setReply(int fd, int code, std::string mess, std::string args)
 		perror("client not found");
 		return -1;
 	}
-    std::ostringstream ss;
-    ss << code;
-    res += ":ircserv.net " + ss.str(); // С++98
+	std::ostringstream ss;
+	ss << code;
+	res += ":ircserv.net " + ss.str(); // С++98
 	if(!client->getNick().empty())
 		res += " " + client->getNick();
 	else
 		res += " *";
-	if(!args.empty())
-		res += " " + args;
+
+	std::cout << "Initial mess: [" << mess << "]" << std::endl;
+	if(!arg1.empty()) {
+		std::string::iterator begin_insertion;
+		std::string::iterator end_insertion;
+		for ( std::string::iterator it=mess.begin(); it!=mess.end(); ++it) {
+			if (*it == '<')
+				begin_insertion = it;
+			if (*it == '>') {
+				end_insertion = it;
+				end_insertion++;
+				break ;
+			}
+		}
+		mess.replace(begin_insertion, end_insertion, arg1);
+	}
+	std::cout << "After 1st replace: [" << mess << "]" << std::endl;
+
+	if(!arg2.empty()) {
+		std::string::iterator begin_insertion;
+		std::string::iterator end_insertion;
+		for ( std::string::iterator it=mess.begin(); it!=mess.end(); ++it) {
+			if (*it == '<')
+				begin_insertion = it;
+			if (*it == '>') {
+				end_insertion = it;
+				end_insertion++;
+				break ;
+			}
+		}
+		mess.replace(begin_insertion, end_insertion, arg2);
+	}
+	std::cout << "After 2nd replace: [" << mess << "]" << std::endl;
+
+
 	res += " " + mess;
 	writeToBuf(fd, res);
 	return 0;
@@ -92,13 +149,13 @@ int		Cmds::NICKCmd(int fd, const Message& msg)
 {
 	Client *client = findClient(fd);
 	if(!client->isPass())
-		return setReply(fd, ERR_NOTREGISTERED, ERR_NOTREGISTERED_MSG, "");
+		return setReply(fd, ERR_NOTREGISTERED, ERR_NOTREGISTERED_MSG, "", "");
 	if(msg.params->Params.empty())
-		return setReply(fd, ERR_NONICKNAMEGIVEN, ERR_NONICKNAMEGIVEN_MSG, "");
+		return setReply(fd, ERR_NONICKNAMEGIVEN, ERR_NONICKNAMEGIVEN_MSG, "", "");
 	if(checkNick(msg.params->Params[0]) == 0)
-		return setReply(fd, ERR_ERRONEUSNICKNAME, ERR_ERRONEUSNICKNAME_MSG, msg.params->Params[0]);
+		return setReply(fd, ERR_ERRONEUSNICKNAME, ERR_ERRONEUSNICKNAME_MSG, msg.params->Params[0], "");
 	if(findClientNick(msg.params->Params[0]) != NULL)
-        return setReply(fd, ERR_NICKNAMEINUSE, ERR_NICKNAMEINUSE_MSG, msg.params->Params[0]);
+        return setReply(fd, ERR_NICKNAMEINUSE, ERR_NICKNAMEINUSE_MSG, msg.params->Params[0], "");
 	else {
         client->setNick(msg.params->Params[0]);
         if (!client->getUserdata()->empty() && !client->isReg())
@@ -111,9 +168,9 @@ int		Cmds::PASSCmd(int fd, const Message& msg)
 {
 	Client *client = findClient(fd);
 	if(client->isPass())
-		return setReply(fd, ERR_ALREADYREGISTRED, ERR_ALREADYREGISTRED_MSG, "");
+		return setReply(fd, ERR_ALREADYREGISTRED, ERR_ALREADYREGISTRED_MSG, "", "");
 	if(msg.params->Params.empty())
-		return setReply(fd, ERR_NEEDMOREPARAMS, ERR_NEEDMOREPARAMS_MSG, "PASS");
+		return setReply(fd, ERR_NEEDMOREPARAMS, ERR_NEEDMOREPARAMS_MSG, "PASS", "");
 	if(msg.params->Params[0] == _server.getPass())
 	    client->setPass();
 	return 0;
@@ -128,11 +185,11 @@ int		Cmds::USERCmd(int fd, const Message& msg)
 		return -1;
 	}
 	if(!client->isPass())
-		return setReply(fd, ERR_NOTREGISTERED, ERR_NOTREGISTERED_MSG, "");
+		return setReply(fd, ERR_NOTREGISTERED, ERR_NOTREGISTERED_MSG, "", "");
 	if(client->isReg())
-		return setReply(fd, ERR_ALREADYREGISTRED, ERR_ALREADYREGISTRED_MSG, "");
+		return setReply(fd, ERR_ALREADYREGISTRED, ERR_ALREADYREGISTRED_MSG, "", "");
 	if(msg.params->Params.empty() || msg.params->Params.size() < 4)
-		return setReply(fd, ERR_NEEDMOREPARAMS, ERR_NEEDMOREPARAMS_MSG, "USER");
+		return setReply(fd, ERR_NEEDMOREPARAMS, ERR_NEEDMOREPARAMS_MSG, "USER", "");
 	client->setUserdata(msg.params->Params);
 	if(!client->getNick().empty())
         regClient(fd);
@@ -142,7 +199,11 @@ int		Cmds::USERCmd(int fd, const Message& msg)
 // JOIN #here, #there 123
 int		Cmds::JOINCmd(int fd, const Message& msg)
 {
-	return 0;
+	return setReply(fd, RPL_TESTING, RPL_TESTING_MSG, "unkown", "mmaida, kallard and tolya");
+
+//	if(msg.params->Params.empty())
+//		return setReply(fd, ERR_NEEDMOREPARAMS, ERR_NEEDMOREPARAMS_MSG, "", "");
+//	return 0;
 }
 
 int		Cmds::QUITCmd(int fd, const std::string& msg)
@@ -167,15 +228,15 @@ int		Cmds::MOTDCmd(int fd, const Message& msg)
 int		Cmds::PRIVMSGCmd(int fd, const Message& msg)
 {
     if(msg.params->Params.empty())
-        return setReply(fd, ERR_NORECIPIENT, ERR_NORECIPIENT_MSG, "");
+        return setReply(fd, ERR_NORECIPIENT, ERR_NORECIPIENT_MSG, "", "");
     if(msg.params->Params.size() == 1)
-        return setReply(fd, ERR_NOTEXTTOSEND, ERR_NOTEXTTOSEND_MSG, "");
+        return setReply(fd, ERR_NOTEXTTOSEND, ERR_NOTEXTTOSEND_MSG, "", "");
     Client *client = findClient(fd);
     std::vector<std::string>::iterator it = msg.params->Params.begin();
     Client *recip =findClientNick(*it);
     //TODO добавить поиск по каналам
     if(recip == NULL)
-        return setReply(fd, ERR_NOSUCHNICK, ERR_NOSUCHNICK_MSG, "");
+        return setReply(fd, ERR_NOSUCHNICK, ERR_NOSUCHNICK_MSG, "", "");
     writeToBuf(recip->getFd(), client->getPrefix() + " PRIVMSG " + recip->getNick() + " :" + msg.params->Params[1]);
 	return 0;
 }

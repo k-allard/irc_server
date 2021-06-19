@@ -1,5 +1,6 @@
 #pragma once
 #include "header.hpp"
+#define OPERPASS 45673
 
 class Server
 {
@@ -20,7 +21,7 @@ public:
 	~Server();
 	void	mainLoop();
 	std::map<int, Client*>	_clients;		// мапа клиентов с ключом - номером сокета и значением - ссылкой на инстанс клиента
-	//std::map<std::string, Channel*> _channels; // мапа каналов с ключом - названием канала
+	std::map<std::string, Channel*> _channels; // мапа каналов с ключом - названием канала
 
 	std::string getPass() {return this->_pass;};
 	int     disconnectClient(int fd);

@@ -22,7 +22,7 @@ public:
 	Cmds(Server &server);
 	~Cmds();
 
-	int		setReply(int fd, int code, std::string mess, std::string args); // создает сообщение по коду ошибки и отправляет его в writeToBuf
+	int		setReply(int fd, int code, std::string mess, std::string arg1, std::string arg2); // создает сообщение по коду ошибки и отправляет его в writeToBuf
 
 	int		NICKCmd(int fd, const Message& msg);
 	int		PASSCmd(int fd, const Message& msg);

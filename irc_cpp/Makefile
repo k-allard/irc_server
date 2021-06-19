@@ -27,6 +27,9 @@ re: fclean all
 test: re
 	@./ircserv 6667 123
 
+test2: re
+	@./ircserv 6668 123
+
 %.o: %.cpp
 	@clang++ $(FLAGS) -c $< -o $@
 

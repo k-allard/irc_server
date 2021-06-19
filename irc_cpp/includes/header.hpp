@@ -30,16 +30,17 @@ class Parser;
 class Client;
 class Cmds;
 class Server;
+class Channel;
 
 #include "MessageCommandEnum.hpp"
 #include "MessageCommand.hpp"
 #include "MessageParams.hpp"
 #include "MessagePrefix.hpp"
 #include "Message.hpp"
-
 #include "Parser.hpp"
 #include "Client.hpp"
 #include "Cmds.hpp"
 #include "Server.hpp"
+#include "Channel.hpp"
 
 // std::string G_CMDS[12] = {"NICK", "PASS", "JOIN", "QUIT", "PART", "MOTD", "PRIVMSG", "MODE", "KICK", "LUSER", "USER", "USERS" };
