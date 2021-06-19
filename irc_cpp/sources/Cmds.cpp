@@ -106,7 +106,7 @@ Client *Cmds::findClientNick(const std::string& nick)
 	return NULL;
 }
 
-Channel *Cmds::findChannelNick(const std::string& name)
+Channel *Cmds::findChannel(const std::string& name)
 {
     std::map<std::string, Channel*>::iterator it;
     it = _channels->find(name);
@@ -232,7 +232,6 @@ int		Cmds::PRIVMSGCmd(int fd, const Message& msg)
     Client *client = findClient(fd);
     std::vector<std::string>::iterator it = msg.params->Params.begin();
     Client *recip =findClientNick(*it);
-    //TODO добавить поиск по каналам
     if(recip == NULL)
         return setReply(fd, ERR_NOSUCHNICK, ERR_NOSUCHNICK_MSG, *it, "");
     writeToBuf(recip->getFd(), ":" + client->getPrefix() + " PRIVMSG " + recip->getNick() + " :" + msg.params->Params[1]);
@@ -271,5 +270,15 @@ int		Cmds::LISTCmd(int fd, const Message& msg)
     {
         for (std::map<std::string, Channel*>::iterator it = _channels->begin(); it != _channels->end(); ++it)
             setReply(fd, RPL_LIST, RPL_LIST_MSG, it->first, it->second->getTopic());
+        setReply(fd, RPL_LISTEND, RPL_LISTEND_MSG, "", "");
     }
+    else
+    {
+        Channel *ch = findChannel(msg.params->Params[0]);
+        if(ch != NULL) {
+            setReply(fd, RPL_LIST, RPL_LIST_MSG, msg.params->Params[0], ch->getTopic());
+            setReply(fd, RPL_LISTEND, RPL_LISTEND_MSG, "", "");
+        }
+    }
+    return 0;
 }

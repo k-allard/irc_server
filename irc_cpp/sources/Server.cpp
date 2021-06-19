@@ -108,6 +108,10 @@ void Server::processMessage(const Message *msg, int fd, Client *client, Cmds *cm
             checkPerror (cmds->PRIVMSGCmd(fd, *msg), "PRIVMSG err");
             break;
         }
+        case MsgCmd_LIST : {
+            checkPerror (cmds->LISTCmd(fd, *msg), "LIST err");
+            break;
+        }
         default: {
             if(client->isReg()) {
                 cmds->setReply(fd, ERR_UNKNOWNCOMMAND, ERR_UNKNOWNCOMMAND_MSG, msg->command->letters, "");

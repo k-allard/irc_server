@@ -276,9 +276,9 @@
 // #define         321     RPL_LISTSTART
 //                         "Channel :Users  Name"
 #define             RPL_LIST  322
-#define             RPL_LIST_MSG "<channel> <# visible> :<topic>"
-// #define         323     RPL_LISTEND
-//                         ":End of /LIST"
+#define             RPL_LIST_MSG "<channel> # visible :<topic>"
+#define           RPL_LISTEND 323
+#define           RPL_LISTEND_MSG ":End of /LIST"
 
 //                 - Replies RPL_LISTSTART, RPL_LIST, RPL_LISTEND mark
 //                   the start, actual replies with data and end of the

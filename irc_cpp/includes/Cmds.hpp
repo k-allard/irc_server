@@ -13,7 +13,7 @@ private:
 	Server &_server;
 
 	Client          *findClientNick(const std::string& nick); // Ишет инстанс клиента по нику
-    Channel         *findChannelNick(const std::string& name);
+    Channel         *findChannel(const std::string& name);
 	// int          checkClient(int fd); // TODO проверяет существует и зарегестрирован ли клиент (для вызова перед каждой коммандой кроме PASS NICK USER)
 	static int		checkNick(std::string nick); // проверка валидности ника max_len = 9, ascii 33-125 dec
 	void            regClient(int fd);
