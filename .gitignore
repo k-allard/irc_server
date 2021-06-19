@@ -9,3 +9,4 @@ client
 server
 .idea/
 CMakeLists.txt
+.gradle/
