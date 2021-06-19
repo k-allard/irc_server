@@ -169,11 +169,39 @@ int		Cmds::USERCmd(int fd, const Message& msg)
 // JOIN #here, #there 123
 int		Cmds::JOINCmd(int fd, const Message& msg)
 {
-	return setReply(fd, RPL_TESTING, RPL_TESTING_MSG, "unkown", "mmaida, kallard and tolya");
 
-//	if(msg.params->Params.empty())
-//		return setReply(fd, ERR_NEEDMOREPARAMS, ERR_NEEDMOREPARAMS_MSG, "", "");
-//	return 0;
+	if(msg.params->Params.empty())
+		return setReply(fd, ERR_NEEDMOREPARAMS, ERR_NEEDMOREPARAMS_MSG, "", "");
+	std::string channelName = msg.params->Params[0];
+
+	Client *client = findClient(fd);
+
+	if (_server._channels.find(channelName) != _server._channels.end()) { // 	такой канал у нас есть
+		// добвить в учатников канала
+		_server._channels[channelName]->addParticipant(fd);
+
+		// всем в этом канале (кроме его самого) разослать :<client prefix> JOIN <channel name>
+		for (std::set<int>::iterator it=_server._channels[channelName]->getParticipantsFds().begin(); it!=_server._channels[channelName]->getParticipantsFds().end(); ++it) {
+			if (*it != fd)
+				writeToBuf(*it, ":" + client->getPrefix() + " JOIN " + channelName);
+			else
+				writeToBuf(fd, "JOIN " + msg.params->Params[0]);
+		}
+
+		// отправили ему топик канала
+		setReply(fd, RPL_TOPIC, RPL_TOPIC_MSG, channelName, _server._channels[channelName]->getTopic());
+
+		// отправили ему список участников каналов + конечное сообщение
+		setReply(fd, RPL_NAMREPLY, RPL_NAMREPLY_MSG, channelName, _server._channels[channelName]->getParticipantsNames());
+		setReply(fd, RPL_ENDOFNAMES, RPL_ENDOFNAMES_MSG, "", "");
+	}
+
+	else {
+//такого канала нет надо создать и его туда добавить
+	}
+
+
+	return 0;
 }
 
 int		Cmds::QUITCmd(int fd, const std::string& msg)

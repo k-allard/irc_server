@@ -1,7 +1,8 @@
 #pragma once
 // ****** FOR  TESTING!!!!!! ****** //
-#define RPL_TESTING                 999 //"This server was created <date>"
+#define RPL_TESTING                 000 //"This server was created <date>"
 #define RPL_TESTING_MSG             ":Hello! Your socket is #<id>. This server is created by <authors>"
+// ADD TO TEST:	return setReply(fd, RPL_TESTING, RPL_TESTING_MSG, "unkown", "mmaida, kallard and tolya"); //
 // ****** ****************** ****** //
 
 
@@ -290,8 +291,8 @@
 
 // #define         331     RPL_NOTOPIC
 //                         "<channel> :No topic is set"
-// #define         332     RPL_TOPIC
-//                         "<channel> :<topic>"
+ #define             RPL_TOPIC 332
+#define              RPL_TOPIC_MSG  "<channel> :<topic>"
 
 //                 - When sending a TOPIC message to determine the
 //                   channel topic, one of two replies is sent.  If
@@ -338,8 +339,9 @@
 //                   after processing each list item with <name> being
 //                   the item.
 
-// #define              RPL_NAMREPLY 353
-//                         "<channel> :[[@|+]<nick> [[@|+]<nick> [...]]]"
+ #define               RPL_NAMREPLY 353
+#define              RPL_NAMREPLY_MSG    "<channel> :<names>"
+
  #define              RPL_ENDOFNAMES 366
 #define 				RPL_ENDOFNAMES_MSG ":End of /NAMES list"
 
