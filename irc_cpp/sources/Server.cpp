@@ -1,7 +1,12 @@
 #include "../includes/Server.hpp"
 
 Server::Server(int port, std::string pass) : _port(port), _pass(pass), _server_fd(0) {
-	initServer();
+    time_t now = time(0);
+    std::string dt(ctime(&now));
+    dt.erase(dt.size() - 1, 1);
+    this->_toc = dt;
+
+    initServer();
 	_clients_fd.clear();
 	_clients.clear();
 	_parser = new Parser(*this);

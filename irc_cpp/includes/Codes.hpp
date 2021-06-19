@@ -6,7 +6,7 @@
 
 
 #define RPL_WELCOME                 001
-#define RPL_WELCOME_MSG             ":Welcome to the Internet Relay Network <nick>!<user>@<host>"
+#define RPL_WELCOME_MSG             ":Welcome to the Internet Relay Network <prefix>"
 
 #define RPL_YOURHOST                002 //"Your host is <servername>, running version <ver>"
 #define RPL_YOURHOST_MSG            ":Your host is ircserv.net, running version 1.0"
@@ -15,13 +15,13 @@
 #define RPL_CREATED_MSG             ":This server was created <date>"
 
 #define RPL_MYINFO                  004 //"<servername> <version> <available user modes> <available channel modes>"
-#define RPL_MYINFO_MSG              ":<servername> <version> <available user modes> <available channel modes>"
+#define RPL_MYINFO_MSG              ":ircserv.net 1.0 -o -o"
 
 //- The server sends Replies 001 to 004 to a user upon
 //successful registration.
 
 #define ERR_NOSUCHNICK				401 //"<nickname> :No such nick/channel"
-#define ERR_NOSUCHNICK_MSG			":No such nick/channel"
+#define ERR_NOSUCHNICK_MSG			"<nickname> :No such nick/channel"
 									//- Used to indicate the nickname parameter supplied to a
 									// command is currently unused.
 
@@ -71,7 +71,7 @@
 //                   "PRIVMSG $<server>" or "PRIVMSG #<host>" is attempted.
 
 #define ERR_UNKNOWNCOMMAND				421 // "<command> :Unknown command"
-#define ERR_UNKNOWNCOMMAND_MSG			":Unknown command"
+#define ERR_UNKNOWNCOMMAND_MSG			"<command> :Unknown command"
 //                 - Returned to a registered client to indicate that the
 //                   command sent is unknown by the server.
 
@@ -93,13 +93,13 @@
 //                   command and isn't found.
 
 #define ERR_ERRONEUSNICKNAME			432// "<nick> :Erroneus nickname"
-#define ERR_ERRONEUSNICKNAME_MSG		":Erroneus nickname"
+#define ERR_ERRONEUSNICKNAME_MSG		"<nick> :Erroneus nickname"
 //                 - Returned after receiving a NICK message which contains
 //                   characters which do not fall in the defined set.  See
 //                   section x.x.x for details on valid nicknames.
 
 #define  ERR_NICKNAMEINUSE				433// "<nick> :Nickname is already in use"
-#define  ERR_NICKNAMEINUSE_MSG			":Nickname is already in use"
+#define  ERR_NICKNAMEINUSE_MSG			"<nick> :Nickname is already in use"
 //                 - Returned when a NICK message is processed that results
 //                   in an attempt to change to a currently existing
 //                   nickname.
@@ -142,7 +142,7 @@
 //                   to be parsed in detail.
 
 #define     ERR_NEEDMOREPARAMS    461      //"<command> :Not enough parameters"
-#define     ERR_NEEDMOREPARAMS_MSG ":Not enough parameters"
+#define     ERR_NEEDMOREPARAMS_MSG "<command> :Not enough parameters"
 //                 - Returned by the server by numerous commands to
 //                   indicate to the client that it didn't supply enough
 //                   parameters.
@@ -274,8 +274,8 @@
 
 // #define         321     RPL_LISTSTART
 //                         "Channel :Users  Name"
-// #define         322     RPL_LIST
-//                         "<channel> <# visible> :<topic>"
+#define             RPL_LIST  322
+#define             RPL_LIST_MSG "<channel> <# visible> :<topic>"
 // #define         323     RPL_LISTEND
 //                         ":End of /LIST"
 
