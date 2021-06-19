@@ -13,7 +13,6 @@ private:
 
 	Client          *findClientNick(const std::string& nick); // Ишет инстанс клиента по нику
 	// int          checkClient(int fd); // TODO проверяет существует и зарегестрирован ли клиент (для вызова перед каждой коммандой кроме PASS NICK USER)
-	int		        writeToBuf(int fd, std::string mess); //Записать сообщение в буфер клиента для отправки
 	static int		checkNick(std::string nick); // проверка валидности ника max_len = 9, ascii 33-125 dec
 	void            regClient(int fd);
     Client          *findClient(int fd); // Ишет инстанс клиента по fd
@@ -23,7 +22,7 @@ public:
 	~Cmds();
 
 	int		setReply(int fd, int code, std::string mess, std::string arg1, std::string arg2); // создает сообщение по коду ошибки и отправляет его в writeToBuf
-
+	int		writeToBuf(int fd, std::string mess); //Записать сообщение в буфер клиента для отправки
 	int		NICKCmd(int fd, const Message& msg);
 	int		PASSCmd(int fd, const Message& msg);
 	int		JOINCmd(int fd, const Message& msg);
