@@ -9,9 +9,11 @@ class Cmds
 {
 private:
 	std::map<int, Client*>	*_clients;
+    std::map<std::string, Channel*> *_channels;
 	Server &_server;
 
 	Client          *findClientNick(const std::string& nick); // Ишет инстанс клиента по нику
+    Channel         *findChannel(const std::string& name);
 	// int          checkClient(int fd); // TODO проверяет существует и зарегестрирован ли клиент (для вызова перед каждой коммандой кроме PASS NICK USER)
 	static int		checkNick(std::string nick); // проверка валидности ника max_len = 9, ascii 33-125 dec
 	void            regClient(int fd);
@@ -37,5 +39,5 @@ public:
 	int		USERCmd(int fd, const Message& msg);
 	int		USERSCmd(int fd, const Message& msg);
     int		PONGCmd(int fd, const Message& msg);
-
+    int		LISTCmd(int fd, const Message& msg);
 };
