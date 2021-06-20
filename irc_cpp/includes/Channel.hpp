@@ -22,6 +22,7 @@ public:
 	int getOperatorFd() { return _operator_fd; }
 	std::string getParticipantsNames();
 	void addParticipant(int fd);
+	int isClientinChannel(int fd);
 	bool ifExist(int fd); // проверить, состоит ли учатник в канале: 0 - нет 1 - да
 	void delParticipantIfExist(int fd); //удалить учатника канала по фд, если такой есть
 	std::set<int> *getParticipantsFds();

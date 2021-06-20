@@ -4,6 +4,7 @@
 Cmds::Cmds(Server &server): _server(server)
 {
 	_clients = &_server._clients;
+	_channels = &_server._channels;
 }
 
 Cmds::~Cmds()
@@ -24,9 +25,9 @@ void            Cmds::regClient(int fd)
     Client *client = findClient(fd);
 
     client->registr();
-    setReply(fd, RPL_WELCOME, RPL_WELCOME_MSG, "", "");
+    setReply(fd, RPL_WELCOME, RPL_WELCOME_MSG, client->getPrefix(), "");
     setReply(fd, RPL_YOURHOST, RPL_YOURHOST_MSG, "", "");
-    setReply(fd, RPL_CREATED, RPL_CREATED_MSG, "", "");
+    setReply(fd, RPL_CREATED, RPL_CREATED_MSG, _server._toc, "");
     setReply(fd, RPL_MYINFO, RPL_MYINFO_MSG, "", "");
 }
 
@@ -38,51 +39,15 @@ int		Cmds::writeToBuf(int fd, std::string mess)
 	return 1;
 }
 
-// Формат ответа:
-// Префикс с названием хоста + код ошибки в формате трехзначного числа + ник получателя (если нет то *) + аргументы полученой команды (если есть) + сообщение по коду
-// Пример: ":irc.example.com 001 borja :Welcome to the Internet Relay Network borja!borja@polaris.cs.uchicago.edu"
-
-//int		Cmds::setReply(int fd, int code, std::string mess, std::string args)
-//{
-//	std::string res;
-//	Client *client = findClient(fd);
-//	if (client == NULL)
-//	{
-//		perror("client not found");
-//		return -1;
-//	}
-//    std::ostringstream ss;
-//    ss << code;
-//    res += ":ircserv.net " + ss.str(); // С++98
-//	if(!client->getNick().empty())
-//		res += " " + client->getNick();
-//	else
-//		res += " *";
-//	if(!args.empty())
-//		res += " " + args;
-//	res += " " + mess;
-//	writeToBuf(fd, res);
-//	return 0;
-//}
-
-int		Cmds::setReply(int fd, int code, std::string mess, std::string arg1, std::string arg2)
+int		Cmds::setReply(int fd, std::string code, std::string mess, std::string arg1, std::string arg2)
 {
 	std::string res;
 	Client *client = findClient(fd);
-	if (client == NULL)
-	{
-		perror("client not found");
-		return -1;
-	}
-	std::ostringstream ss;
-	ss << code;
-	res += ":ircserv.net " + ss.str(); // С++98
+	res += ":ircserv.net " + code;
 	if(!client->getNick().empty())
 		res += " " + client->getNick();
 	else
 		res += " *";
-
-	// std::cout << "Initial mess: [" << mess << "]" << std::endl;
 	if(!arg1.empty()) {
 		std::string::iterator begin_insertion;
 		std::string::iterator end_insertion;
@@ -97,8 +62,6 @@ int		Cmds::setReply(int fd, int code, std::string mess, std::string arg1, std::s
 		}
 		mess.replace(begin_insertion, end_insertion, arg1);
 	}
-	// std::cout << "After 1st replace: [" << mess << "]" << std::endl;
-
 	if(!arg2.empty()) {
 		std::string::iterator begin_insertion;
 		std::string::iterator end_insertion;
@@ -113,9 +76,6 @@ int		Cmds::setReply(int fd, int code, std::string mess, std::string arg1, std::s
 		}
 		mess.replace(begin_insertion, end_insertion, arg2);
 	}
-	// std::cout << "After 2nd replace: [" << mess << "]" << std::endl;
-
-
 	res += " " + mess;
 	writeToBuf(fd, res);
 	return 0;
@@ -123,6 +83,8 @@ int		Cmds::setReply(int fd, int code, std::string mess, std::string arg1, std::s
 
 int		Cmds::checkNick(std::string nick)
 {
+    if(isChannelNameCorrect(nick))
+        return 0;
 	if(nick.size() > 9)
 		return 0;
     for(int i = 0; i < nick.size(); i++)
@@ -144,6 +106,14 @@ Client *Cmds::findClientNick(const std::string& nick)
 	return NULL;
 }
 
+Channel *Cmds::findChannel(const std::string& name)
+{
+    std::map<std::string, Channel*>::iterator it;
+    it = _channels->find(name);
+    if (it == _channels->end())
+        return NULL;
+    return it->second;
+}
 
 int		Cmds::NICKCmd(int fd, const Message& msg)
 {
@@ -310,16 +280,27 @@ int		Cmds::MOTDCmd(int fd, const Message& msg)
 int		Cmds::PRIVMSGCmd(int fd, const Message& msg)
 {
     if(msg.params->Params.empty())
-        return setReply(fd, ERR_NORECIPIENT, ERR_NORECIPIENT_MSG, "", "");
+        return setReply(fd, ERR_NORECIPIENT, ERR_NORECIPIENT_MSG, "PRIVMSG", "");
     if(msg.params->Params.size() == 1)
         return setReply(fd, ERR_NOTEXTTOSEND, ERR_NOTEXTTOSEND_MSG, "", "");
     Client *client = findClient(fd);
     std::vector<std::string>::iterator it = msg.params->Params.begin();
-    Client *recip =findClientNick(*it);
-    //TODO добавить поиск по каналам
-    if(recip == NULL)
-        return setReply(fd, ERR_NOSUCHNICK, ERR_NOSUCHNICK_MSG, "", "");
-    writeToBuf(recip->getFd(), client->getPrefix() + " PRIVMSG " + recip->getNick() + " :" + msg.params->Params[1]);
+    if(isChannelNameCorrect(*it))
+    {
+        Channel *recip = findChannel(*it);
+        if(recip == NULL)
+            return setReply(fd, ERR_NOSUCHNICK, ERR_NOSUCHNICK_MSG, *it, "");
+        if(!recip->isClientinChannel(fd))
+            return setReply(fd, ERR_CANNOTSENDTOCHAN, ERR_CANNOTSENDTOCHAN_MSG, *it, "");
+        recip->sendMessToAll(":" + client->getPrefix() + " PRIVMSG " + *it + " :" + msg.params->Params[1]);
+    }
+    else
+    {
+        Client *recip = findClientNick(*it);
+        if(recip == NULL)
+            return setReply(fd, ERR_NOSUCHNICK, ERR_NOSUCHNICK_MSG, *it, "");
+        writeToBuf(recip->getFd(), ":" + client->getPrefix() + " PRIVMSG " + recip->getNick() + " :" + msg.params->Params[1]);
+    }
 	return 0;
 }
 
@@ -370,5 +351,24 @@ int		Cmds::USERSCmd(int fd, const Message& msg)
 int		Cmds::PONGCmd(int fd, const Message& msg)
 {
     writeToBuf(fd, "PONG " + msg.params->Params[0]);
+    return 0;
+}
+
+int		Cmds::LISTCmd(int fd, const Message& msg)
+{
+    if(msg.params->Params.empty())
+    {
+        for (std::map<std::string, Channel*>::iterator it = _channels->begin(); it != _channels->end(); ++it)
+            setReply(fd, RPL_LIST, RPL_LIST_MSG, it->first, it->second->getTopic());
+        setReply(fd, RPL_LISTEND, RPL_LISTEND_MSG, "", "");
+    }
+    else
+    {
+        Channel *ch = findChannel(msg.params->Params[0]);
+        if(ch != NULL) {
+            setReply(fd, RPL_LIST, RPL_LIST_MSG, msg.params->Params[0], ch->getTopic());
+            setReply(fd, RPL_LISTEND, RPL_LISTEND_MSG, "", "");
+        }
+    }
     return 0;
 }

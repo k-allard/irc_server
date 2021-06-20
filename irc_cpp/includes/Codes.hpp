@@ -6,23 +6,23 @@
 // ****** ****************** ****** //
 
 
-#define RPL_WELCOME                 001
-#define RPL_WELCOME_MSG             ":Welcome to the Internet Relay Network <nick>!<user>@<host>"
+#define RPL_WELCOME                 "001"
+#define RPL_WELCOME_MSG             ":Welcome to the Internet Relay Network <prefix>"
 
-#define RPL_YOURHOST                002 //"Your host is <servername>, running version <ver>"
+#define RPL_YOURHOST                "002" //"Your host is <servername>, running version <ver>"
 #define RPL_YOURHOST_MSG            ":Your host is ircserv.net, running version 1.0"
 
-#define RPL_CREATED                 003 //"This server was created <date>"
+#define RPL_CREATED                 "003" //"This server was created <date>"
 #define RPL_CREATED_MSG             ":This server was created <date>"
 
-#define RPL_MYINFO                  004 //"<servername> <version> <available user modes> <available channel modes>"
-#define RPL_MYINFO_MSG              ":<servername> <version> <available user modes> <available channel modes>"
+#define RPL_MYINFO                  "004" //"<servername> <version> <available user modes> <available channel modes>"
+#define RPL_MYINFO_MSG              ":ircserv.net 1.0 o o"
 
 //- The server sends Replies 001 to 004 to a user upon
 //successful registration.
 
-#define ERR_NOSUCHNICK				401 //"<nickname> :No such nick/channel"
-#define ERR_NOSUCHNICK_MSG			":No such nick/channel"
+#define ERR_NOSUCHNICK				"401" //"<nickname> :No such nick/channel"
+#define ERR_NOSUCHNICK_MSG			"<nickname> :No such nick/channel"
 									//- Used to indicate the nickname parameter supplied to a
 									// command is currently unused.
 
@@ -30,11 +30,12 @@
 									//- Used to indicate the server name given currently
 									// doesn't exist.
 
-#define ERR_NOSUCHCHANNEL	403 
+#define ERR_NOSUCHCHANNEL	"403" 
 #define ERR_NOSUCHCHANNEL_MSG "<channel name> :No such channel"
 									//- Used to indicate the given channel name is invalid.
 
-//#define ERR_CANNOTSENDTOCHAN		404 //"<channel name> :Cannot send to channel"
+#define ERR_CANNOTSENDTOCHAN		"404" //"<channel name> :Cannot send to channel"
+#define ERR_CANNOTSENDTOCHAN_MSG     "<channel name> :Cannot send to channel"
 									//- Sent to a user who is either (a) not on a channelnullptr
 									// which is mode +n or (b) not a chanop (or mode +v) on
 									// a channel which has mode +m set and is trying to send
@@ -59,9 +60,9 @@
 //                   which is required since these commands must work
 //                   without valid prefixes.
 
-#define ERR_NORECIPIENT 411      // ":No recipient given (<command>)"
+#define ERR_NORECIPIENT "411"      // ":No recipient given (<command>)"
 #define ERR_NORECIPIENT_MSG ":No recipient given (<command>)"
-#define ERR_NOTEXTTOSEND 412 // ":No text to send"
+#define ERR_NOTEXTTOSEND "412" // ":No text to send"
 #define ERR_NOTEXTTOSEND_MSG ":No text to send"
 // #define         413     ERR_NOTOPLEVEL // "<mask> :No toplevel domain specified"
 // #define         414     ERR_WILDTOPLEVEL // "<mask> :Wildcard in toplevel domain"
@@ -72,8 +73,8 @@
 //                   are returned when an invalid use of
 //                   "PRIVMSG $<server>" or "PRIVMSG #<host>" is attempted.
 
-#define ERR_UNKNOWNCOMMAND				421 // "<command> :Unknown command"
-#define ERR_UNKNOWNCOMMAND_MSG			":Unknown command"
+#define ERR_UNKNOWNCOMMAND				"421" // "<command> :Unknown command"
+#define ERR_UNKNOWNCOMMAND_MSG			"<command> :Unknown command"
 //                 - Returned to a registered client to indicate that the
 //                   command sent is unknown by the server.
 
@@ -89,19 +90,19 @@
 //                 - Generic error message used to report a failed file
 //                   operation during the processing of a message.
 
-#define ERR_NONICKNAMEGIVEN				431 // ":No nickname given"
+#define ERR_NONICKNAMEGIVEN				"431" // ":No nickname given"
 #define ERR_NONICKNAMEGIVEN_MSG			":No nickname given"
 //                 - Returned when a nickname parameter expected for a
 //                   command and isn't found.
 
-#define ERR_ERRONEUSNICKNAME			432// "<nick> :Erroneus nickname"
-#define ERR_ERRONEUSNICKNAME_MSG		":Erroneus nickname"
+#define ERR_ERRONEUSNICKNAME			"432"// "<nick> :Erroneus nickname"
+#define ERR_ERRONEUSNICKNAME_MSG		"<nick> :Erroneus nickname"
 //                 - Returned after receiving a NICK message which contains
 //                   characters which do not fall in the defined set.  See
 //                   section x.x.x for details on valid nicknames.
 
-#define  ERR_NICKNAMEINUSE				433// "<nick> :Nickname is already in use"
-#define  ERR_NICKNAMEINUSE_MSG			":Nickname is already in use"
+#define  ERR_NICKNAMEINUSE				"433"// "<nick> :Nickname is already in use"
+#define  ERR_NICKNAMEINUSE_MSG			"<nick> :Nickname is already in use"
 //                 - Returned when a NICK message is processed that results
 //                   in an attempt to change to a currently existing
 //                   nickname.
@@ -115,14 +116,14 @@
 //                 - Returned by the server to indicate that the target
 //                   user of the command is not on the given channel.
 
-#define         ERR_NOTONCHANNEL 442   
+#define         ERR_NOTONCHANNEL "442"   
 #define ERR_NOTONCHANNEL_MSG "<channel> :You're not on that channel"
 
 //                 - Returned by the server whenever a client tries to
 //                   perform a channel effecting command for which the
 //                   client isn't a member.
 
- #define              ERR_USERONCHANNEL 443
+ #define              ERR_USERONCHANNEL "443"
  #define              ERR_USERONCHANNEL_MSG "<user> <channel> :is already on channel"
 //                 - Returned when a client tries to invite a user to a
 //                   channel they are already on.
@@ -140,19 +141,19 @@
 //                 - Returned as a response to the USERS command.  Must be
 //                   returned by any server which does not implement it.
 
-#define    ERR_NOTREGISTERED     451      // ":You have not registered"
+#define    ERR_NOTREGISTERED     "451"      // ":You have not registered"
 #define		ERR_NOTREGISTERED_MSG ":You have not registered"
 //                 - Returned by the server to indicate that the client
 //                   must be registered before the server will allow it
 //                   to be parsed in detail.
 
-#define     ERR_NEEDMOREPARAMS    461      //"<command> :Not enough parameters"
-#define     ERR_NEEDMOREPARAMS_MSG ":Not enough parameters"
+#define     ERR_NEEDMOREPARAMS    "461"      //"<command> :Not enough parameters"
+#define     ERR_NEEDMOREPARAMS_MSG "<command> :Not enough parameters"
 //                 - Returned by the server by numerous commands to
 //                   indicate to the client that it didn't supply enough
 //                   parameters.
 
-#define    ERR_ALREADYREGISTRED    462     // ":You may not reregister"
+#define    ERR_ALREADYREGISTRED    "462"     // ":You may not reregister"
 #define    ERR_ALREADYREGISTRED_MSG  ":You may not reregister"
 //                 - Returned by the server to any link which tries to
 //                   change part of the registered details (such as
@@ -179,14 +180,14 @@
 // #define         472     ERR_UNKNOWNMODE // "<char> :is unknown mode char to me"
 // #define         473     ERR_INVITEONLYCHAN // "<channel> :Cannot join channel (+i)"
 // #define         474     ERR_BANNEDFROMCHAN // "<channel> :Cannot join channel (+b)"
- #define              ERR_BADCHANNELKEY 475
+ #define              ERR_BADCHANNELKEY "475"
 #define              ERR_BADCHANNELKEY_MSG "<channel> :Cannot join channel (+k)"
 // #define         481     ERR_NOPRIVILEGES // ":Permission Denied- You're not an IRC operator"
 //                 - Any command requiring operator privileges to operate
 //                   must return this error to indicate the attempt was
 //                   unsuccessful.
 
-#define        ERR_CHANOPRIVSNEEDED 482      
+#define        ERR_CHANOPRIVSNEEDED "482"      
 #define ERR_CHANOPRIVSNEEDED_MSG "<channel> :You're not channel operator"
 
 //                 - Any command requiring 'chanop' privileges (such as
@@ -282,10 +283,10 @@
 
 // #define         321     RPL_LISTSTART
 //                         "Channel :Users  Name"
-// #define         322     RPL_LIST
-//                         "<channel> <# visible> :<topic>"
-// #define         323     RPL_LISTEND
-//                         ":End of /LIST"
+#define             RPL_LIST  "322"
+#define             RPL_LIST_MSG "<channel> # visible :<topic>"
+#define           RPL_LISTEND "323"
+#define           RPL_LISTEND_MSG ":End of /LIST"
 
 //                 - Replies RPL_LISTSTART, RPL_LIST, RPL_LISTEND mark
 //                   the start, actual replies with data and end of the
@@ -298,7 +299,7 @@
 
 // #define         331     RPL_NOTOPIC
 //                         "<channel> :No topic is set"
- #define             RPL_TOPIC 332
+ #define             RPL_TOPIC "332"
 #define              RPL_TOPIC_MSG  "<channel> :<topic>"
 
 //                 - When sending a TOPIC message to determine the
@@ -346,10 +347,10 @@
 //                   after processing each list item with <name> being
 //                   the item.
 
- #define               RPL_NAMREPLY 353
+ #define               RPL_NAMREPLY "353"
 #define              RPL_NAMREPLY_MSG    "<channel> :<names>"
 
- #define              RPL_ENDOFNAMES 366
+ #define              RPL_ENDOFNAMES "366"
 #define 				RPL_ENDOFNAMES_MSG ":End of /NAMES list"
 
 //                 - To reply to a NAMES message, a reply pair consisting
