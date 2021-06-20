@@ -12,6 +12,13 @@ std::string Channel::getParticipantsNames() {
 	return names;
 }
 
+std::string Channel::getNumClients()
+{
+    std::stringstream ss;
+    ss << _participants_fds.size();
+    return ss.str();
+}
+
 void Channel::addParticipant(int fd) { _participants_fds.insert(fd); }
 
 void Channel::delParticipantIfExist(int fd) { _participants_fds.erase(fd); }

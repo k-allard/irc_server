@@ -10,13 +10,13 @@
 #define RPL_WELCOME_MSG             ":Welcome to the Internet Relay Network <prefix>"
 
 #define RPL_YOURHOST                "002" //"Your host is <servername>, running version <ver>"
-#define RPL_YOURHOST_MSG            ":Your host is ircserv.net, running version 1.0"
+#define RPL_YOURHOST_MSG            ":Your host is <name>, running version 1.0"
 
 #define RPL_CREATED                 "003" //"This server was created <date>"
 #define RPL_CREATED_MSG             ":This server was created <date>"
 
 #define RPL_MYINFO                  "004" //"<servername> <version> <available user modes> <available channel modes>"
-#define RPL_MYINFO_MSG              ":ircserv.net 1.0 o o"
+#define RPL_MYINFO_MSG              ":<name> 1.0 o o"
 
 //- The server sends Replies 001 to 004 to a user upon
 //successful registration.
@@ -281,10 +281,10 @@
 //                   be RPL_ENDOFWHOWAS (even if there was only one reply
 //                   and it was an error).
 
-// #define         321     RPL_LISTSTART
-//                         "Channel :Users  Name"
+ #define      RPL_LISTSTART   "321"
+#define      RPL_LISTSTART_MSG                       "Channel :Users  Name"
 #define             RPL_LIST  "322"
-#define             RPL_LIST_MSG "<channel> # visible :<topic>"
+#define             RPL_LIST_MSG "<channel> <visible> :"
 #define           RPL_LISTEND "323"
 #define           RPL_LISTEND_MSG ":End of /LIST"
 

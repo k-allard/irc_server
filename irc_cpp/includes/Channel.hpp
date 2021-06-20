@@ -19,6 +19,7 @@ public:
 
 	void setTopic(std::string topic) { _topic = topic; }
 	std::string getTopic() { return _topic; }
+	std::string getNumClients();
 	int getOperatorFd() { return _operator_fd; }
 	std::string getParticipantsNames();
 	void addParticipant(int fd);

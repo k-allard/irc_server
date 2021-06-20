@@ -5,6 +5,7 @@
 class Server
 {
 private:
+    std::string             _name;
 	int						_port;
 	std::string				_pass;
 	int 					_server_fd;
@@ -26,6 +27,7 @@ public:
     std::string             _toc;           //время создания сервера
 
 	std::string getPass() {return this->_pass;};
+    std::string getName() {return this->_name;};
 	int     disconnectClient(int fd);
 
 private:

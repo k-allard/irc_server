@@ -25,10 +25,10 @@ void            Cmds::regClient(int fd)
     Client *client = findClient(fd);
 
     client->registr();
-    setReply(fd, RPL_WELCOME, RPL_WELCOME_MSG, client->getPrefix(), "");
-    setReply(fd, RPL_YOURHOST, RPL_YOURHOST_MSG, "", "");
-    setReply(fd, RPL_CREATED, RPL_CREATED_MSG, _server._toc, "");
-    setReply(fd, RPL_MYINFO, RPL_MYINFO_MSG, "", "");
+    setReply(fd, RPL_WELCOME, RPL_WELCOME_MSG, client->getPrefix());
+    setReply(fd, RPL_YOURHOST, RPL_YOURHOST_MSG, _server.getName());
+    setReply(fd, RPL_CREATED, RPL_CREATED_MSG, _server._toc);
+    setReply(fd, RPL_MYINFO, RPL_MYINFO_MSG, _server.getName());
 }
 
 int		Cmds::writeToBuf(int fd, std::string mess)
@@ -39,11 +39,53 @@ int		Cmds::writeToBuf(int fd, std::string mess)
 	return 1;
 }
 
-int		Cmds::setReply(int fd, std::string code, std::string mess, std::string arg1, std::string arg2)
+int		Cmds::setReply(int fd, const std::string& code, std::string mess)
+{
+    std::string res;
+    Client *client = findClient(fd);
+    res += ":" + _server.getName() + " " + code;
+    if(!client->getNick().empty())
+        res += " " + client->getNick();
+    else
+        res += " *";
+    res += " " + mess;
+    writeToBuf(fd, res);
+    return 0;
+}
+
+int		Cmds::setReply(int fd, const std::string& code, std::string mess, const std::string& arg1)
+{
+    std::string res;
+    Client *client = findClient(fd);
+    res += ":" + _server.getName() + " " + code;
+    if(!client->getNick().empty())
+        res += " " + client->getNick();
+    else
+        res += " *";
+    if(!arg1.empty()) {
+        std::string::iterator begin_insertion;
+        std::string::iterator end_insertion;
+        for ( std::string::iterator it=mess.begin(); it!=mess.end(); ++it) {
+            if (*it == '<')
+                begin_insertion = it;
+            if (*it == '>') {
+                end_insertion = it;
+                end_insertion++;
+                break ;
+            }
+        }
+        mess.replace(begin_insertion, end_insertion, arg1);
+    }
+    res += " " + mess;
+    writeToBuf(fd, res);
+    return 0;
+}
+
+int		Cmds::setReply(int fd, const std::string& code, std::string mess, const std::string& arg1, const std::string& arg2)
 {
 	std::string res;
 	Client *client = findClient(fd);
-	res += ":ircserv.net " + code;
+    res += ":" + _server.getName() + " " + code;
 	if(!client->getNick().empty())
 		res += " " + client->getNick();
 	else
@@ -79,6 +121,62 @@ int		Cmds::setReply(int fd, std::string code, std::string mess, std::string arg1
 	res += " " + mess;
 	writeToBuf(fd, res);
 	return 0;
+}
+
+int		Cmds::setReply(int fd, const std::string& code, std::string mess, const std::string& arg1, const std::string& arg2, const std::string& arg3)
+{
+    std::string res;
+    Client *client = findClient(fd);
+    res += ":" + _server.getName() + " " + code;
+    if(!client->getNick().empty())
+        res += " " + client->getNick();
+    else
+        res += " *";
+    if(!arg1.empty()) {
+        std::string::iterator begin_insertion;
+        std::string::iterator end_insertion;
+        for ( std::string::iterator it=mess.begin(); it!=mess.end(); ++it) {
+            if (*it == '<')
+                begin_insertion = it;
+            if (*it == '>') {
+                end_insertion = it;
+                end_insertion++;
+                break ;
+            }
+        }
+        mess.replace(begin_insertion, end_insertion, arg1);
+    }
+    if(!arg2.empty()) {
+        std::string::iterator begin_insertion;
+        std::string::iterator end_insertion;
+        for ( std::string::iterator it=mess.begin(); it!=mess.end(); ++it) {
+            if (*it == '<')
+                begin_insertion = it;
+            if (*it == '>') {
+                end_insertion = it;
+                end_insertion++;
+                break ;
+            }
+        }
+        mess.replace(begin_insertion, end_insertion, arg2);
+    }
+    if(!arg3.empty()) {
+        std::string::iterator begin_insertion;
+        std::string::iterator end_insertion;
+        for ( std::string::iterator it=mess.begin(); it!=mess.end(); ++it) {
+            if (*it == '<')
+                begin_insertion = it;
+            if (*it == '>') {
+                end_insertion = it;
+                end_insertion++;
+                break ;
+            }
+        }
+        mess.replace(begin_insertion, end_insertion, arg3);
+    }
+    res += " " + mess;
+    writeToBuf(fd, res);
+    return 0;
 }
 
 int		Cmds::checkNick(std::string nick)
@@ -119,13 +217,13 @@ int		Cmds::NICKCmd(int fd, const Message& msg)
 {
 	Client *client = findClient(fd);
 	if(!client->isPass())
-		return setReply(fd, ERR_NOTREGISTERED, ERR_NOTREGISTERED_MSG, "", "");
+		return setReply(fd, ERR_NOTREGISTERED, ERR_NOTREGISTERED_MSG);
 	if(msg.params->Params.empty())
-		return setReply(fd, ERR_NONICKNAMEGIVEN, ERR_NONICKNAMEGIVEN_MSG, "", "");
+		return setReply(fd, ERR_NONICKNAMEGIVEN, ERR_NONICKNAMEGIVEN_MSG);
 	if(checkNick(msg.params->Params[0]) == 0)
-		return setReply(fd, ERR_ERRONEUSNICKNAME, ERR_ERRONEUSNICKNAME_MSG, msg.params->Params[0], "");
+		return setReply(fd, ERR_ERRONEUSNICKNAME, ERR_ERRONEUSNICKNAME_MSG, msg.params->Params[0]);
 	if(findClientNick(msg.params->Params[0]) != NULL)
-        return setReply(fd, ERR_NICKNAMEINUSE, ERR_NICKNAMEINUSE_MSG, msg.params->Params[0], "");
+        return setReply(fd, ERR_NICKNAMEINUSE, ERR_NICKNAMEINUSE_MSG, msg.params->Params[0]);
 	else {
         client->setNick(msg.params->Params[0]);
         if (!client->getUserdata()->empty() && !client->isReg())
@@ -138,9 +236,9 @@ int		Cmds::PASSCmd(int fd, const Message& msg)
 {
 	Client *client = findClient(fd);
 	if(client->isPass())
-		return setReply(fd, ERR_ALREADYREGISTRED, ERR_ALREADYREGISTRED_MSG, "", "");
+		return setReply(fd, ERR_ALREADYREGISTRED, ERR_ALREADYREGISTRED_MSG);
 	if(msg.params->Params.empty())
-		return setReply(fd, ERR_NEEDMOREPARAMS, ERR_NEEDMOREPARAMS_MSG, "PASS", "");
+		return setReply(fd, ERR_NEEDMOREPARAMS, ERR_NEEDMOREPARAMS_MSG, "PASS");
 	if(msg.params->Params[0] == _server.getPass())
 	    client->setPass();
 	return 0;
@@ -155,11 +253,11 @@ int		Cmds::USERCmd(int fd, const Message& msg)
 		return -1;
 	}
 	if(!client->isPass())
-		return setReply(fd, ERR_NOTREGISTERED, ERR_NOTREGISTERED_MSG, "", "");
+		return setReply(fd, ERR_NOTREGISTERED, ERR_NOTREGISTERED_MSG);
 	if(client->isReg())
-		return setReply(fd, ERR_ALREADYREGISTRED, ERR_ALREADYREGISTRED_MSG, "", "");
+		return setReply(fd, ERR_ALREADYREGISTRED, ERR_ALREADYREGISTRED_MSG);
 	if(msg.params->Params.empty() || msg.params->Params.size() < 4)
-		return setReply(fd, ERR_NEEDMOREPARAMS, ERR_NEEDMOREPARAMS_MSG, "USER", "");
+		return setReply(fd, ERR_NEEDMOREPARAMS, ERR_NEEDMOREPARAMS_MSG, "USER");
 	client->setUserdata(msg.params->Params);
 	if(!client->getNick().empty())
         regClient(fd);
@@ -170,7 +268,7 @@ int		Cmds::USERCmd(int fd, const Message& msg)
 int		Cmds::JOINCmd(int fd, const Message& msg)
 {
 	if(msg.params->Params.empty())
-		return setReply(fd, ERR_NEEDMOREPARAMS, ERR_NEEDMOREPARAMS_MSG, "", "");
+		return setReply(fd, ERR_NEEDMOREPARAMS, ERR_NEEDMOREPARAMS_MSG);
 	std::string channelName = msg.params->Params[0];
 	Client *client = findClient(fd);
     Channel *ch = findChannel(channelName);
@@ -187,19 +285,19 @@ int		Cmds::JOINCmd(int fd, const Message& msg)
 			setReply(fd, RPL_TOPIC, RPL_TOPIC_MSG, channelName, _server._channels[channelName]->getTopic());
 		// отправили ему список участников каналов + конечное сообщение TODO заменить на NAMES
 		setReply(fd, RPL_NAMREPLY, RPL_NAMREPLY_MSG, channelName, _server._channels[channelName]->getParticipantsNames());
-		setReply(fd, RPL_ENDOFNAMES, RPL_ENDOFNAMES_MSG, "", "");
+		setReply(fd, RPL_ENDOFNAMES, RPL_ENDOFNAMES_MSG);
 	}
 	else //такого канала нет надо создать и его туда добавить
 	{
 		if (!isChannelNameCorrect(channelName))
-            return setReply(fd, ERR_NOSUCHCHANNEL, ERR_NOSUCHCHANNEL_MSG, channelName, "");
+            return setReply(fd, ERR_NOSUCHCHANNEL, ERR_NOSUCHCHANNEL_MSG, channelName);
 		Channel *newChannel = new Channel(fd, _server);
 		_server._channels.insert( std::pair<std::string, Channel*>(channelName,newChannel) );
 
         writeToBuf(fd, ":" + client->getPrefix() + " JOIN " + channelName);
         // отправили ему список участников каналов + конечное сообщение TODO заменить на NAMES
         setReply(fd, RPL_NAMREPLY, RPL_NAMREPLY_MSG, channelName, _server._channels[channelName]->getParticipantsNames());
-        setReply(fd, RPL_ENDOFNAMES, RPL_ENDOFNAMES_MSG, "", "");
+        setReply(fd, RPL_ENDOFNAMES, RPL_ENDOFNAMES_MSG);
 	}
 	return 0;
 }
@@ -219,11 +317,37 @@ int Cmds::isChannelNameCorrect(std::string name) {
 	return 1;
 }
 
-int		Cmds::QUITCmd(int fd, const std::string& msg)
+int		Cmds::QUITCmd(int fd, const Message& msg)
 {
     writeToBuf(fd, "ERROR Closing Link");
+    Client *client = findClient(fd);
+    std::string mess = client->getNick();
+    if(!msg.params->Params.empty())
+        mess = msg.params->Params[0];
+    for(std::map<std::string, Channel*>::iterator it = _channels->begin(); it != _channels->end(); ++it)
+    {
+        if(it->second->ifExist(fd))
+        {
+            it->second->delParticipantIfExist(fd);
+            it->second->sendMessToAll(fd, ":" + client->getPrefix() + " QUIT " + mess);
+        }
+    }
     _server.disconnectClient(fd);
-    // TODO отправить команнду QUIT всем каналам в которых был этот юзер с аргументом (если не дан то ник)
+    return 0;
+}
+
+int		Cmds::QUITCmd(int fd)
+{
+    Client *client = findClient(fd);
+    for(std::map<std::string, Channel*>::iterator it = _channels->begin(); it != _channels->end(); ++it)
+    {
+        if(it->second->ifExist(fd))
+        {
+            it->second->delParticipantIfExist(fd);
+            it->second->sendMessToAll(fd, ":" + client->getPrefix() + " QUIT " + client->getNick());
+        }
+    }
+    _server.disconnectClient(fd);
 	return 0;
 }
 
@@ -232,15 +356,15 @@ int		Cmds::PARTCmd(int fd, const Message& msg)
 {
 	Client *client = findClient(fd);
 	if(msg.params->Params.empty())
-		return setReply(fd, ERR_NEEDMOREPARAMS, ERR_NEEDMOREPARAMS_MSG, "", "");
+		return setReply(fd, ERR_NEEDMOREPARAMS, ERR_NEEDMOREPARAMS_MSG);
 	std::string channelName = msg.params->Params[0];
 	if (_server._channels.find(channelName) == _server._channels.end()) {
 		// std::cout << "D E B U G: ERR_ NO SUCH CHANNEL" << std::endl;
-		return setReply(fd, ERR_NOSUCHCHANNEL, ERR_NOSUCHCHANNEL_MSG, channelName, "");
+		return setReply(fd, ERR_NOSUCHCHANNEL, ERR_NOSUCHCHANNEL_MSG, channelName);
 	}
 	if (!_server._channels.find(channelName)->second->ifExist(fd)) {
 		// std::cout << "D E B U G: ERR_ NOT ON CHANNEL" << std::endl;
-		return setReply(fd, ERR_NOTONCHANNEL, ERR_NOTONCHANNEL_MSG, channelName, "");
+		return setReply(fd, ERR_NOTONCHANNEL, ERR_NOTONCHANNEL_MSG, channelName);
 	}
 	_server._channels.find(channelName)->second->delParticipantIfExist(fd);
 	// std::cout << "D E B U G: 	Удалили с канала. " << std::endl;
@@ -260,25 +384,25 @@ int		Cmds::MOTDCmd(int fd, const Message& msg)
 int		Cmds::PRIVMSGCmd(int fd, const Message& msg)
 {
     if(msg.params->Params.empty())
-        return setReply(fd, ERR_NORECIPIENT, ERR_NORECIPIENT_MSG, "PRIVMSG", "");
+        return setReply(fd, ERR_NORECIPIENT, ERR_NORECIPIENT_MSG, "PRIVMSG");
     if(msg.params->Params.size() == 1)
-        return setReply(fd, ERR_NOTEXTTOSEND, ERR_NOTEXTTOSEND_MSG, "", "");
+        return setReply(fd, ERR_NOTEXTTOSEND, ERR_NOTEXTTOSEND_MSG);
     Client *client = findClient(fd);
     std::vector<std::string>::iterator it = msg.params->Params.begin();
     if(isChannelNameCorrect(*it))
     {
         Channel *recip = findChannel(*it);
         if(recip == NULL)
-            return setReply(fd, ERR_NOSUCHNICK, ERR_NOSUCHNICK_MSG, *it, "");
+            return setReply(fd, ERR_NOSUCHNICK, ERR_NOSUCHNICK_MSG, *it);
         if(!recip->ifExist(fd))
-            return setReply(fd, ERR_CANNOTSENDTOCHAN, ERR_CANNOTSENDTOCHAN_MSG, *it, "");
+            return setReply(fd, ERR_CANNOTSENDTOCHAN, ERR_CANNOTSENDTOCHAN_MSG, *it);
         recip->sendMessToAll(fd, ":" + client->getPrefix() + " PRIVMSG " + *it + " :" + msg.params->Params[1]);
     }
     else
     {
         Client *recip = findClientNick(*it);
         if(recip == NULL)
-            return setReply(fd, ERR_NOSUCHNICK, ERR_NOSUCHNICK_MSG, *it, "");
+            return setReply(fd, ERR_NOSUCHNICK, ERR_NOSUCHNICK_MSG, *it);
         writeToBuf(recip->getFd(), ":" + client->getPrefix() + " PRIVMSG " + recip->getNick() + " :" + msg.params->Params[1]);
     }
 	return 0;
@@ -294,22 +418,22 @@ int		Cmds::MODECmd(int fd, const Message& msg)
 int		Cmds::KICKCmd(int fd, const Message& msg)
 {
 	if(msg.params->Params.size() < 2)
-        return setReply(fd, ERR_NEEDMOREPARAMS, ERR_NEEDMOREPARAMS_MSG, "", "");
+        return setReply(fd, ERR_NEEDMOREPARAMS, ERR_NEEDMOREPARAMS_MSG);
 	std::string channelName = msg.params->Params[0];
 	if (_server._channels.find(channelName) == _server._channels.end()) {
 		// std::cout << "D E B U G: ERR_ NO SUCH CHANNEL" << std::endl;
-		return setReply(fd, ERR_NOSUCHCHANNEL, ERR_NOSUCHCHANNEL_MSG, channelName, "");
+		return setReply(fd, ERR_NOSUCHCHANNEL, ERR_NOSUCHCHANNEL_MSG, channelName);
 	}
 	Client *client = findClientNick(msg.params->Params[1]);
 	if (!client)
-		return setReply(fd, ERR_NOTONCHANNEL, ERR_NOTONCHANNEL_MSG, channelName, "");
+		return setReply(fd, ERR_NOTONCHANNEL, ERR_NOTONCHANNEL_MSG, channelName);
 	int fdToKick = client->getFd();
 	if (!_server._channels.find(channelName)->second->ifExist(fdToKick)) {
 		// std::cout << "D E B U G: ERR_ NOT ON CHANNEL" << std::endl;
-		return setReply(fd, ERR_NOTONCHANNEL, ERR_NOTONCHANNEL_MSG, channelName, "");
+		return setReply(fd, ERR_NOTONCHANNEL, ERR_NOTONCHANNEL_MSG, channelName);
 	}
 	if (_server._channels.find(channelName)->second->getOperatorFd() != fd)
-		return setReply(fd, ERR_CHANOPRIVSNEEDED, ERR_CHANOPRIVSNEEDED_MSG, channelName, "");
+		return setReply(fd, ERR_CHANOPRIVSNEEDED, ERR_CHANOPRIVSNEEDED_MSG, channelName);
 	_server._channels.find(channelName)->second->delParticipantIfExist(fdToKick);
 	// std::cout << "D E B U G: 	Удалили с канала. " << std::endl;
 	writeToBuf(fdToKick, "PART " + channelName);
@@ -341,15 +465,17 @@ int		Cmds::LISTCmd(int fd, const Message& msg)
 {
     if(msg.params->Params.empty())
     {
+        setReply(fd, RPL_LISTSTART, RPL_LISTSTART_MSG, "", "");
         for (std::map<std::string, Channel*>::iterator it = _channels->begin(); it != _channels->end(); ++it)
-            setReply(fd, RPL_LIST, RPL_LIST_MSG, it->first, it->second->getTopic());
+            setReply(fd, RPL_LIST, RPL_LIST_MSG, it->first, it->second->getNumClients(), it->second->getTopic());
         setReply(fd, RPL_LISTEND, RPL_LISTEND_MSG, "", "");
     }
     else
     {
         Channel *ch = findChannel(msg.params->Params[0]);
         if(ch != NULL) {
-            setReply(fd, RPL_LIST, RPL_LIST_MSG, msg.params->Params[0], ch->getTopic());
+            setReply(fd, RPL_LISTSTART, RPL_LISTSTART_MSG, "", "");
+            setReply(fd, RPL_LIST, RPL_LIST_MSG, msg.params->Params[0], ch->getNumClients(), ch->getTopic());
             setReply(fd, RPL_LISTEND, RPL_LISTEND_MSG, "", "");
         }
     }

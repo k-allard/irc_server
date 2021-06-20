@@ -6,6 +6,7 @@ Server::Server(int port, std::string pass) : _port(port), _pass(pass), _server_f
     dt.erase(dt.size() - 1, 1);
     this->_toc = dt;
 
+    _name = "ircserv.net";
     initServer();
 	_clients_fd.clear();
 	_clients.clear();
@@ -102,7 +103,7 @@ void Server::processMessage(const Message *msg, int fd, Client *client, Cmds *cm
             break;
         }
         case MsgCmd_QUIT : {
-            checkPerror (cmds->QUITCmd(fd, (*msg).params->toString()), "QUIT err");
+            checkPerror (cmds->QUITCmd(fd, *msg), "QUIT err");
             break;
         }
         case MsgCmd_PRIVMSG : {
@@ -162,7 +163,7 @@ void Server::checkFds() {
 			// Поступили данные от клиента, читаем их
 			if ((bytes_read = recv(*it, _buf, 512, 0)) <= 0) {
 				// Соединение разорвано, удаляем сокет из сета
-				cmds.QUITCmd(*it, "");
+				cmds.QUITCmd(*it);
 				break ;
 			}
 			_clients.at(*it)->appendMessageBuffer(_buf);
