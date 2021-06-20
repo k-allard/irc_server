@@ -27,6 +27,7 @@ public:
 
 	std::string getPass() {return this->_pass;};
 	int     disconnectClient(int fd);
+	std::string getNamesNotInChannels(); //строка имен не состоящих ни в одном канале
 
 private:
 	void	initServer();

@@ -1,14 +1,16 @@
 #include "../includes/Channel.hpp"
 
 std::string Channel::getParticipantsNames() {
-	std::string names;
-	std::map<int, Client *>::iterator itAfterLast = _server._clients.end();
-	itAfterLast--;
-	for (std::map<int, Client *>::iterator it=_server._clients.begin(); it!=_server._clients.end(); ++it) {
-		names += (*it).second->getNick();
-		if (it!=itAfterLast)
-			names += " ";
+	std::string names = "";
+
+	for (std::set<int>::iterator it=_participants_fds.begin(); it!=_participants_fds.end(); ++it) {
+		if (*it == _operator_fd)
+			names += "@";
+		names += _server._clients[*it]->getNick();
+		names += " ";
 	}
+	if (!names.empty())
+		names.erase(names.size() - 1, 1);
 	return names;
 }
 

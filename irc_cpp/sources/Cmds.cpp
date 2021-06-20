@@ -166,7 +166,7 @@ int		Cmds::USERCmd(int fd, const Message& msg)
 	return 0;
 }
 
-// JOIN #here, #there 123
+// JOIN #here
 int		Cmds::JOINCmd(int fd, const Message& msg)
 {
 
@@ -266,6 +266,10 @@ int		Cmds::PARTCmd(int fd, const Message& msg)
 	}
 	_server._channels.find(channelName)->second->delParticipantIfExist(fd);
 	// std::cout << "D E B U G: 	Удалили с канала. " << std::endl;
+	if (_server._channels[channelName]->getParticipantsFds()->empty()) {	//это был последний в канале
+		_server._channels.erase(channelName);
+		return 0;
+	}
 	std::set<int> *UsersStillOnChannel = _server._channels[channelName]->getParticipantsFds();
 	std::set<int>::iterator it;
   	for (it=UsersStillOnChannel->begin(); it!=UsersStillOnChannel->end(); ++it) {
@@ -341,6 +345,25 @@ int		Cmds::KICKCmd(int fd, const Message& msg)
 		writeToBuf(*it, ":" + client->getPrefix() + " PART " + channelName);
   }
 	return 0;
+}
+
+int		Cmds::NAMESCmd(int fd, const Message& msg)
+{
+	if(msg.params->Params.empty()) {
+		for (std::map<std::string, Channel *>::iterator it=_server._channels.begin(); it!=_server._channels.end(); ++it)
+    		setReply(fd, RPL_NAMREPLY, RPL_NAMREPLY_MSG, it->first, it->second->getParticipantsNames());
+		std::string notInChannels = _server.getNamesNotInChannels();
+		if (!notInChannels.empty())
+			setReply(fd, RPL_NAMREPLY, RPL_NAMREPLY_MSG, "*", notInChannels);
+	} 
+	else {
+		// отправили ему список участников одного канала + конечное сообщение
+		std::string channelName = msg.params->Params[0];
+		if (_server._channels.find(channelName) == _server._channels.end())
+			return -1;
+		setReply(fd, RPL_NAMREPLY, RPL_NAMREPLY_MSG, channelName, _server._channels[channelName]->getParticipantsNames());
+	}
+	return setReply(fd, RPL_ENDOFNAMES, RPL_ENDOFNAMES_MSG, "", "");
 }
 
 int		Cmds::LUSERCmd(int fd, const Message& msg)
