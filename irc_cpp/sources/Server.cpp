@@ -79,6 +79,26 @@ void Server::checkPerror(int code, const char* errorMessage)
         perror(errorMessage);
 }
 
+std::string Server::getNamesNotInChannels()
+{
+	std::string names = "";
+
+	for (std::map<int,Client *>::iterator it=_clients.begin(); it!=_clients.end(); ++it) {
+		int isFound = 0;
+		for (std::map<std::string, Channel *>::iterator it_ch=_channels.begin(); it_ch!=_channels.end() && isFound == 0; ++it_ch) {
+			if (it_ch->second->getParticipantsFds()->find((*it).first) != it_ch->second->getParticipantsFds()->end())
+				isFound = 1;
+		}
+		if (isFound == 0) {
+			names += (*it).second->getNick();
+			names += " ";
+		}
+	}
+	if (!names.empty())
+		names.erase(names.size() - 1, 1);
+	return names;
+}
+
 void Server::processMessage(const Message *msg, int fd, Client *client, Cmds *cmds) {
 
     switch (msg->command->cmdType) {
@@ -122,6 +142,10 @@ void Server::processMessage(const Message *msg, int fd, Client *client, Cmds *cm
             checkPerror(cmds->KICKCmd(fd, *msg), "KICK err");
             break;
         }
+		case MsgCmd_NAMES : {
+			checkPerror(cmds->NAMESCmd(fd, *msg), "NAMES err");
+            break;
+		}
         default: {
             if(client->isReg()) {
                 cmds->setReply(fd, ERR_UNKNOWNCOMMAND, ERR_UNKNOWNCOMMAND_MSG, msg->command->letters, "");
