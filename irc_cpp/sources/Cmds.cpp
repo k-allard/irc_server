@@ -186,6 +186,7 @@ int		Cmds::JOINCmd(int fd, const Message& msg)
 		}
 		std::cout << "D E B U G: добавить в учаcтников канала, он еще не там" << std::endl;
 		_server._channels[channelName]->addParticipant(fd);
+		// std::cout << "D E B U G: отправить ему джойн в ответочку. его фд [" << fd << "]" << std::endl;
 		writeToBuf(fd, "JOIN " + channelName);		
 		// всем в этом канале (кроме его самого) разослать :<client prefix> JOIN <channel name>
 		for (std::set<int>::iterator it=_server._channels[channelName]->getParticipantsFds()->begin(); it!=_server._channels[channelName]->getParticipantsFds()->end(); ++it) {
@@ -217,6 +218,7 @@ int		Cmds::JOINCmd(int fd, const Message& msg)
 		if (ret.second == false) { 	//channel not inserted
 			return setReply(fd, ERR_BADCHANNELKEY, ERR_BADCHANNELKEY_MSG, channelName, "");
 		}
+		writeToBuf(fd, "JOIN " + channelName);		
 
 	}
 
@@ -320,7 +322,9 @@ int		Cmds::KICKCmd(int fd, const Message& msg)
 		// std::cout << "D E B U G: ERR_ NO SUCH CHANNEL" << std::endl;
 		return setReply(fd, ERR_NOSUCHCHANNEL, ERR_NOSUCHCHANNEL_MSG, channelName, "");
 	}
-	Client *client = findClientNick(msg.params->Params[0]);
+	Client *client = findClientNick(msg.params->Params[1]);
+	if (!client)
+		return setReply(fd, ERR_NOTONCHANNEL, ERR_NOTONCHANNEL_MSG, channelName, "");
 	int fdToKick = client->getFd();
 	if (!_server._channels.find(channelName)->second->ifExist(fdToKick)) {
 		// std::cout << "D E B U G: ERR_ NOT ON CHANNEL" << std::endl;
@@ -330,6 +334,7 @@ int		Cmds::KICKCmd(int fd, const Message& msg)
 		return setReply(fd, ERR_CHANOPRIVSNEEDED, ERR_CHANOPRIVSNEEDED_MSG, channelName, "");
 	_server._channels.find(channelName)->second->delParticipantIfExist(fdToKick);
 	// std::cout << "D E B U G: 	Удалили с канала. " << std::endl;
+	writeToBuf(fdToKick, "PART " + channelName); 
 	std::set<int> *UsersStillOnChannel = _server._channels[channelName]->getParticipantsFds();
 	std::set<int>::iterator it;
   	for (it=UsersStillOnChannel->begin(); it!=UsersStillOnChannel->end(); ++it) {
