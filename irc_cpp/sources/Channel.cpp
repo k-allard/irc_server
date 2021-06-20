@@ -20,18 +20,11 @@ bool Channel::ifExist(int fd) { return (_participants_fds.find(fd) != _participa
 
 std::set<int> *Channel::getParticipantsFds() { return &_participants_fds; }
 
-// всем в этом канале разослать mess
-void Channel::sendMessToAll(std::string mess) {
+// всем в этом канале разослать mess кроме fd (если есть)
+void Channel::sendMessToAll(int fd, std::string mess) {
 	for (std::set<int>::iterator it=_participants_fds.begin(); it!=_participants_fds.end(); ++it) {
 		mess += "\r\n";
-		_server._clients[*it]->_buf.push(mess);
+		if(*it != fd)
+		    _server._clients[*it]->_buf.push(mess);
 	}
-}
-
-int Channel::isClientinChannel(int fd)
-{
-    std::set<int>::iterator it=_participants_fds.find(fd);
-    if(it == _participants_fds.end())
-        return 0;
-    return 1;
 }

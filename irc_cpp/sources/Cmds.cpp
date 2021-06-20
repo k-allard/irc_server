@@ -169,59 +169,38 @@ int		Cmds::USERCmd(int fd, const Message& msg)
 // JOIN #here, #there 123
 int		Cmds::JOINCmd(int fd, const Message& msg)
 {
-
 	if(msg.params->Params.empty())
 		return setReply(fd, ERR_NEEDMOREPARAMS, ERR_NEEDMOREPARAMS_MSG, "", "");
 	std::string channelName = msg.params->Params[0];
-
 	Client *client = findClient(fd);
-
-	if (_server._channels.find(channelName) != _server._channels.end()) { // 	такой канал у нас есть
+    Channel *ch = findChannel(channelName);
+	if (ch != NULL) // 	такой канал у нас есть
+	{
 		// добвить в учатников канала, если он еще не там
-		std::set<int>::iterator it;
-		it = _server._channels[channelName]->getParticipantsFds()->find(fd);
-		if (it != _server._channels[channelName]->getParticipantsFds()->end()) {
-			std::cout << "D E B U G: не добавить в учаcтников канала, он уже там" << std::endl;
+		if (ch->ifExist(fd))
 			return setReply(fd, ERR_USERONCHANNEL, ERR_USERONCHANNEL_MSG, client->getNick(), channelName);
-		}
-		std::cout << "D E B U G: добавить в учаcтников канала, он еще не там" << std::endl;
-		_server._channels[channelName]->addParticipant(fd);
+		ch->addParticipant(fd);
 		// всем в этом канале (кроме его самого) разослать :<client prefix> JOIN <channel name>
-		for (std::set<int>::iterator it=_server._channels[channelName]->getParticipantsFds()->begin(); it!=_server._channels[channelName]->getParticipantsFds()->end(); ++it) {
-			if (*it != fd)
-				writeToBuf(*it, ":" + client->getPrefix() + " JOIN " + channelName);
-			else
-				writeToBuf(fd, "JOIN " + msg.params->Params[0]);
-		}
-
+        ch->sendMessToAll(0, ":" + client->getPrefix() + " JOIN " + channelName);
 		// отправили ему топик канала
 		if (!_server._channels[channelName]->getTopic().empty())
 			setReply(fd, RPL_TOPIC, RPL_TOPIC_MSG, channelName, _server._channels[channelName]->getTopic());
-
-		// отправили ему список участников каналов + конечное сообщение
+		// отправили ему список участников каналов + конечное сообщение TODO заменить на NAMES
 		setReply(fd, RPL_NAMREPLY, RPL_NAMREPLY_MSG, channelName, _server._channels[channelName]->getParticipantsNames());
 		setReply(fd, RPL_ENDOFNAMES, RPL_ENDOFNAMES_MSG, "", "");
 	}
-
-	else { //такого канала нет надо создать и его туда добавить
-		std::cout << "D E B U G: создать канал и добвить в учаcтников создателя" << std::endl;
-		if (!isChannelNameCorrect(channelName)) {
-			std::cout << "D E B U G: некорректное имя канала, выходим из джойна" << std::endl;
-			return -1;
-		}
-		std::cout << "D E B U G: корректное имя канала, создаем" << std::endl;
-
+	else //такого канала нет надо создать и его туда добавить
+	{
+		if (!isChannelNameCorrect(channelName))
+            return setReply(fd, ERR_NOSUCHCHANNEL, ERR_NOSUCHCHANNEL_MSG, channelName, "");
 		Channel *newChannel = new Channel(fd, _server);
+		_server._channels.insert( std::pair<std::string, Channel*>(channelName,newChannel) );
 
-		std::pair<std::map<std::string, Channel*>::iterator,bool> ret;
-		ret = _server._channels.insert( std::pair<std::string, Channel*>(channelName,newChannel) );
-		if (ret.second == false) { 	//channel not inserted
-			return setReply(fd, ERR_BADCHANNELKEY, ERR_BADCHANNELKEY_MSG, channelName, "");
-		}
-
+        writeToBuf(fd, ":" + client->getPrefix() + " JOIN " + channelName);
+        // отправили ему список участников каналов + конечное сообщение TODO заменить на NAMES
+        setReply(fd, RPL_NAMREPLY, RPL_NAMREPLY_MSG, channelName, _server._channels[channelName]->getParticipantsNames());
+        setReply(fd, RPL_ENDOFNAMES, RPL_ENDOFNAMES_MSG, "", "");
 	}
-
-
 	return 0;
 }
 
@@ -269,8 +248,8 @@ int		Cmds::PARTCmd(int fd, const Message& msg)
 	std::set<int>::iterator it;
   	for (it=UsersStillOnChannel->begin(); it!=UsersStillOnChannel->end(); ++it) {
 		writeToBuf(*it, ":" + client->getPrefix() + " PART " + channelName);
-  }
-
+    }
+    return 0;
 }
 
 int		Cmds::MOTDCmd(int fd, const Message& msg)
@@ -291,9 +270,9 @@ int		Cmds::PRIVMSGCmd(int fd, const Message& msg)
         Channel *recip = findChannel(*it);
         if(recip == NULL)
             return setReply(fd, ERR_NOSUCHNICK, ERR_NOSUCHNICK_MSG, *it, "");
-        if(!recip->isClientinChannel(fd))
+        if(!recip->ifExist(fd))
             return setReply(fd, ERR_CANNOTSENDTOCHAN, ERR_CANNOTSENDTOCHAN_MSG, *it, "");
-        recip->sendMessToAll(":" + client->getPrefix() + " PRIVMSG " + *it + " :" + msg.params->Params[1]);
+        recip->sendMessToAll(fd, ":" + client->getPrefix() + " PRIVMSG " + *it + " :" + msg.params->Params[1]);
     }
     else
     {

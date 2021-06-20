@@ -21,11 +21,10 @@ public:
 	std::string getTopic() { return _topic; }
 	std::string getParticipantsNames();
 	void addParticipant(int fd);
-	int isClientinChannel(int fd);
 	bool ifExist(int fd); // проверить, состоит ли учатник в канале: 0 - нет 1 - да
 	void delParticipantIfExist(int fd); //удалить учатника канала по фд, если такой есть
 	std::set<int> *getParticipantsFds();
-	// всем в этом канале разослать mess
-	void sendMessToAll(std::string mess);
+    // всем в этом канале разослать mess кроме fd (если есть)
+	void sendMessToAll(int fd, std::string mess);
 
 };

@@ -30,7 +30,7 @@
 									//- Used to indicate the server name given currently
 									// doesn't exist.
 
-#define ERR_NOSUCHCHANNEL	403 
+#define ERR_NOSUCHCHANNEL	"403"
 #define ERR_NOSUCHCHANNEL_MSG "<channel name> :No such channel"
 									//- Used to indicate the given channel name is invalid.
 
@@ -116,7 +116,7 @@
 //                 - Returned by the server to indicate that the target
 //                   user of the command is not on the given channel.
 
-#define         ERR_NOTONCHANNEL 442   
+#define         ERR_NOTONCHANNEL "442"
 #define ERR_NOTONCHANNEL_MSG "<channel> :You're not on that channel"
 
 //                 - Returned by the server whenever a client tries to
@@ -346,7 +346,7 @@
 //                   the item.
 
  #define               RPL_NAMREPLY "353"
-#define              RPL_NAMREPLY_MSG    "<channel> :<names>"
+#define              RPL_NAMREPLY_MSG    "= <channel> :<names>"
 
  #define              RPL_ENDOFNAMES "366"
 #define 				RPL_ENDOFNAMES_MSG ":End of /NAMES list"
