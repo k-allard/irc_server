@@ -30,7 +30,8 @@
 									//- Used to indicate the server name given currently
 									// doesn't exist.
 
-//#define ERR_NOSUCHCHANNEL			403 //"<channel name> :No such channel"
+#define ERR_NOSUCHCHANNEL	403 
+#define ERR_NOSUCHCHANNEL_MSG "<channel name> :No such channel"
 									//- Used to indicate the given channel name is invalid.
 
 #define ERR_CANNOTSENDTOCHAN		"404" //"<channel name> :Cannot send to channel"
@@ -115,7 +116,9 @@
 //                 - Returned by the server to indicate that the target
 //                   user of the command is not on the given channel.
 
-// #define         442     ERR_NOTONCHANNEL // "<channel> :You're not on that channel"
+#define         ERR_NOTONCHANNEL 442   
+#define ERR_NOTONCHANNEL_MSG "<channel> :You're not on that channel"
+
 //                 - Returned by the server whenever a client tries to
 //                   perform a channel effecting command for which the
 //                   client isn't a member.

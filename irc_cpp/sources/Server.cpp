@@ -79,6 +79,7 @@ void Server::checkPerror(int code, const char* errorMessage)
 }
 
 void Server::processMessage(const Message *msg, int fd, Client *client, Cmds *cmds) {
+
     switch (msg->command->cmdType) {
         case MsgCmd_NICK : {
             checkPerror (cmds->NICKCmd(fd, *msg), "NICK err");
@@ -110,6 +111,10 @@ void Server::processMessage(const Message *msg, int fd, Client *client, Cmds *cm
         }
         case MsgCmd_LIST : {
             checkPerror (cmds->LISTCmd(fd, *msg), "LIST err");
+            break;
+        }
+		case MsgCmd_PART : {
+            checkPerror(cmds->PARTCmd(fd, *msg), "PART err");
             break;
         }
         default: {

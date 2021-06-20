@@ -248,10 +248,29 @@ int		Cmds::QUITCmd(int fd, const std::string& msg)
 	return 0;
 }
 
-//PART #here, :#there zzz
+//PART #here
 int		Cmds::PARTCmd(int fd, const Message& msg)
 {
-	return 0;
+	Client *client = findClient(fd);
+	if(msg.params->Params.empty())
+		return setReply(fd, ERR_NEEDMOREPARAMS, ERR_NEEDMOREPARAMS_MSG, "", "");
+	std::string channelName = msg.params->Params[0];
+	if (_server._channels.find(channelName) == _server._channels.end()) {
+		// std::cout << "D E B U G: ERR_ NO SUCH CHANNEL" << std::endl;
+		return setReply(fd, ERR_NOSUCHCHANNEL, ERR_NOSUCHCHANNEL_MSG, channelName, "");
+	}
+	if (!_server._channels.find(channelName)->second->ifExist(fd)) {
+		// std::cout << "D E B U G: ERR_ NOT ON CHANNEL" << std::endl;
+		return setReply(fd, ERR_NOTONCHANNEL, ERR_NOTONCHANNEL_MSG, channelName, "");
+	}
+	_server._channels.find(channelName)->second->delParticipantIfExist(fd);
+	// std::cout << "D E B U G: 	Удалили с канала. " << std::endl;
+	std::set<int> *UsersStillOnChannel = _server._channels[channelName]->getParticipantsFds();
+	std::set<int>::iterator it;
+  	for (it=UsersStillOnChannel->begin(); it!=UsersStillOnChannel->end(); ++it) {
+		writeToBuf(*it, ":" + client->getPrefix() + " PART " + channelName);
+  }
+
 }
 
 int		Cmds::MOTDCmd(int fd, const Message& msg)
