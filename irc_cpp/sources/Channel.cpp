@@ -14,6 +14,10 @@ std::string Channel::getParticipantsNames() {
 
 void Channel::addParticipant(int fd) { _participants_fds.insert(fd); }
 
+void Channel::delParticipantIfExist(int fd) { _participants_fds.erase(fd); }
+
+bool Channel::ifExist(int fd) { return (_participants_fds.find(fd) != _participants_fds.end()); }
+
 std::set<int> *Channel::getParticipantsFds() { return &_participants_fds; }
 
 // всем в этом канале разослать mess

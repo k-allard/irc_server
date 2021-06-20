@@ -17,7 +17,10 @@ Client::Client(const Client &src)
 
 std::string        Client::getPrefix()
 {
-    return (_nick + "!" + _userdata[0] + "@" + _userdata[1]);
+	if (!_userdata.empty())
+    	return (_nick + "!" + _userdata[0] + "@" + _userdata[1]);
+	else 
+		return ("nick!user@host");
 }
 
 Client &Client::operator=(const Client &src)
