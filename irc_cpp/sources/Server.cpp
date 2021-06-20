@@ -117,6 +117,10 @@ void Server::processMessage(const Message *msg, int fd, Client *client, Cmds *cm
             checkPerror(cmds->PARTCmd(fd, *msg), "PART err");
             break;
         }
+		case MsgCmd_KICK : {
+            checkPerror(cmds->KICKCmd(fd, *msg), "KICK err");
+            break;
+        }
         default: {
             if(client->isReg()) {
                 cmds->setReply(fd, ERR_UNKNOWNCOMMAND, ERR_UNKNOWNCOMMAND_MSG, msg->command->letters, "");

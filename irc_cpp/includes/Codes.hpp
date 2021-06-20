@@ -187,7 +187,9 @@
 //                   must return this error to indicate the attempt was
 //                   unsuccessful.
 
-// #define         482     ERR_CHANOPRIVSNEEDED // "<channel> :You're not channel operator"
+#define        ERR_CHANOPRIVSNEEDED "482"
+#define ERR_CHANOPRIVSNEEDED_MSG "<channel> :You're not channel operator"
+
 //                 - Any command requiring 'chanop' privileges (such as
 //                   MODE messages) must return this error if the client
 //                   making the attempt is not a chanop on the specified

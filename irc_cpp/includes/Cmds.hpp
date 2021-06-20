@@ -1,6 +1,14 @@
 #pragma once
 #include "header.hpp"
+/*
+PASS 123
+NICK petya
+USER petr petr petr petr
 
+PASS 123
+NICK natasha
+USER natali natali natali natali
+*/
 #include "Codes.hpp"
 #include "Message.hpp"
 

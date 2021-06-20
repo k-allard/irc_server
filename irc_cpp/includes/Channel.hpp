@@ -19,6 +19,7 @@ public:
 
 	void setTopic(std::string topic) { _topic = topic; }
 	std::string getTopic() { return _topic; }
+	int getOperatorFd() { return _operator_fd; }
 	std::string getParticipantsNames();
 	void addParticipant(int fd);
 	bool ifExist(int fd); // проверить, состоит ли учатник в канале: 0 - нет 1 - да
