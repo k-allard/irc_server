@@ -82,7 +82,7 @@ int		Cmds::setReply(int fd, int code, std::string mess, std::string arg1, std::s
 	else
 		res += " *";
 
-	std::cout << "Initial mess: [" << mess << "]" << std::endl;
+	// std::cout << "Initial mess: [" << mess << "]" << std::endl;
 	if(!arg1.empty()) {
 		std::string::iterator begin_insertion;
 		std::string::iterator end_insertion;
@@ -97,7 +97,7 @@ int		Cmds::setReply(int fd, int code, std::string mess, std::string arg1, std::s
 		}
 		mess.replace(begin_insertion, end_insertion, arg1);
 	}
-	std::cout << "After 1st replace: [" << mess << "]" << std::endl;
+	// std::cout << "After 1st replace: [" << mess << "]" << std::endl;
 
 	if(!arg2.empty()) {
 		std::string::iterator begin_insertion;
@@ -113,7 +113,7 @@ int		Cmds::setReply(int fd, int code, std::string mess, std::string arg1, std::s
 		}
 		mess.replace(begin_insertion, end_insertion, arg2);
 	}
-	std::cout << "After 2nd replace: [" << mess << "]" << std::endl;
+	// std::cout << "After 2nd replace: [" << mess << "]" << std::endl;
 
 
 	res += " " + mess;
@@ -143,6 +143,7 @@ Client *Cmds::findClientNick(const std::string& nick)
 	}
 	return NULL;
 }
+
 
 int		Cmds::NICKCmd(int fd, const Message& msg)
 {
@@ -215,12 +216,11 @@ int		Cmds::JOINCmd(int fd, const Message& msg)
 		}
 		std::cout << "D E B U G: добавить в учаcтников канала, он еще не там" << std::endl;
 		_server._channels[channelName]->addParticipant(fd);
+		writeToBuf(fd, "JOIN " + channelName);		
 		// всем в этом канале (кроме его самого) разослать :<client prefix> JOIN <channel name>
 		for (std::set<int>::iterator it=_server._channels[channelName]->getParticipantsFds()->begin(); it!=_server._channels[channelName]->getParticipantsFds()->end(); ++it) {
 			if (*it != fd)
 				writeToBuf(*it, ":" + client->getPrefix() + " JOIN " + channelName);
-			else
-				writeToBuf(fd, "JOIN " + msg.params->Params[0]);
 		}
 
 		// отправили ему топик канала
@@ -299,7 +299,7 @@ int		Cmds::PARTCmd(int fd, const Message& msg)
   	for (it=UsersStillOnChannel->begin(); it!=UsersStillOnChannel->end(); ++it) {
 		writeToBuf(*it, ":" + client->getPrefix() + " PART " + channelName);
   }
-
+	return 0;
 }
 
 int		Cmds::MOTDCmd(int fd, const Message& msg)
@@ -328,8 +328,32 @@ int		Cmds::MODECmd(int fd, const Message& msg)
 	return 0;
 }
 
+
+//   Parameters: <channel> <user> 
 int		Cmds::KICKCmd(int fd, const Message& msg)
 {
+	if(msg.params->Params.size() < 2)
+        return setReply(fd, ERR_NEEDMOREPARAMS, ERR_NEEDMOREPARAMS_MSG, "", "");
+	std::string channelName = msg.params->Params[0];
+	if (_server._channels.find(channelName) == _server._channels.end()) {
+		// std::cout << "D E B U G: ERR_ NO SUCH CHANNEL" << std::endl;
+		return setReply(fd, ERR_NOSUCHCHANNEL, ERR_NOSUCHCHANNEL_MSG, channelName, "");
+	}
+	Client *client = findClientNick(msg.params->Params[0]);
+	int fdToKick = client->getFd();
+	if (!_server._channels.find(channelName)->second->ifExist(fdToKick)) {
+		// std::cout << "D E B U G: ERR_ NOT ON CHANNEL" << std::endl;
+		return setReply(fd, ERR_NOTONCHANNEL, ERR_NOTONCHANNEL_MSG, channelName, "");
+	}
+	if (_server._channels.find(channelName)->second->getOperatorFd() != fd)
+		return setReply(fd, ERR_CHANOPRIVSNEEDED, ERR_CHANOPRIVSNEEDED_MSG, channelName, "");
+	_server._channels.find(channelName)->second->delParticipantIfExist(fdToKick);
+	// std::cout << "D E B U G: 	Удалили с канала. " << std::endl;
+	std::set<int> *UsersStillOnChannel = _server._channels[channelName]->getParticipantsFds();
+	std::set<int>::iterator it;
+  	for (it=UsersStillOnChannel->begin(); it!=UsersStillOnChannel->end(); ++it) {
+		writeToBuf(*it, ":" + client->getPrefix() + " PART " + channelName);
+  }
 	return 0;
 }
 
