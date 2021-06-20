@@ -39,13 +39,11 @@ int		Cmds::writeToBuf(int fd, std::string mess)
 	return 1;
 }
 
-int		Cmds::setReply(int fd, int code, std::string mess, std::string arg1, std::string arg2)
+int		Cmds::setReply(int fd, std::string code, std::string mess, std::string arg1, std::string arg2)
 {
 	std::string res;
 	Client *client = findClient(fd);
-	std::ostringstream ss;
-	ss << code;
-	res += ":ircserv.net " + ss.str(); // С++98
+	res += ":ircserv.net " + code;
 	if(!client->getNick().empty())
 		res += " " + client->getNick();
 	else
@@ -85,6 +83,8 @@ int		Cmds::setReply(int fd, int code, std::string mess, std::string arg1, std::s
 
 int		Cmds::checkNick(std::string nick)
 {
+    if(isChannelNameCorrect(nick))
+        return 0;
 	if(nick.size() > 9)
 		return 0;
     for(int i = 0; i < nick.size(); i++)
@@ -267,10 +267,22 @@ int		Cmds::PRIVMSGCmd(int fd, const Message& msg)
         return setReply(fd, ERR_NOTEXTTOSEND, ERR_NOTEXTTOSEND_MSG, "", "");
     Client *client = findClient(fd);
     std::vector<std::string>::iterator it = msg.params->Params.begin();
-    Client *recip =findClientNick(*it);
-    if(recip == NULL)
-        return setReply(fd, ERR_NOSUCHNICK, ERR_NOSUCHNICK_MSG, *it, "");
-    writeToBuf(recip->getFd(), ":" + client->getPrefix() + " PRIVMSG " + recip->getNick() + " :" + msg.params->Params[1]);
+    if(isChannelNameCorrect(*it))
+    {
+        Channel *recip = findChannel(*it);
+        if(recip == NULL)
+            return setReply(fd, ERR_NOSUCHNICK, ERR_NOSUCHNICK_MSG, *it, "");
+        if(!recip->isClientinChannel(fd))
+            return setReply(fd, ERR_CANNOTSENDTOCHAN, ERR_CANNOTSENDTOCHAN_MSG, *it, "");
+        recip->sendMessToAll(":" + client->getPrefix() + " PRIVMSG " + *it + " :" + msg.params->Params[1]);
+    }
+    else
+    {
+        Client *recip = findClientNick(*it);
+        if(recip == NULL)
+            return setReply(fd, ERR_NOSUCHNICK, ERR_NOSUCHNICK_MSG, *it, "");
+        writeToBuf(recip->getFd(), ":" + client->getPrefix() + " PRIVMSG " + recip->getNick() + " :" + msg.params->Params[1]);
+    }
 	return 0;
 }
 

@@ -21,6 +21,7 @@ public:
 	std::string getTopic() { return _topic; }
 	std::string getParticipantsNames();
 	void addParticipant(int fd);
+	int isClientinChannel(int fd);
 	std::set<int> *getParticipantsFds();
 	// всем в этом канале разослать mess
 	void sendMessToAll(std::string mess);

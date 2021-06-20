@@ -23,3 +23,11 @@ void Channel::sendMessToAll(std::string mess) {
 		_server._clients[*it]->_buf.push(mess);
 	}
 }
+
+int Channel::isClientinChannel(int fd)
+{
+    std::set<int>::iterator it=_participants_fds.find(fd);
+    if(it == _participants_fds.end())
+        return 0;
+    return 1;
+}
