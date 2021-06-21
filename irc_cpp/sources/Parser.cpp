@@ -23,7 +23,7 @@ std::vector<Message> Parser::do_parsing(int fd, char *buf, int size)
 			continue;
 		if (tmp.at(tmp.size() - 1) == '\r')
 			tmp.erase(tmp.size() - 1, 1);
-//		std::cerr << "[" << tmp << "]" << std::endl;
+		std::cerr << "[" << tmp << "]" << std::endl;
 		data.push(tmp);
 	}
 	while(!data.empty()) {
@@ -31,28 +31,28 @@ std::vector<Message> Parser::do_parsing(int fd, char *buf, int size)
 		result.push_back(msg);
 
 		// for DEBUG
-//		if(msg.command->cmdType == MsgCmd__UNKNOWN)
-//		{
-//			std::cerr << "Parser: Unknown command from client #" << fd << ". Client input :" << std::endl;
-//			std::cerr << "       \"" << data.front() << "\"" << std::endl;
-//			std::cout << std::endl;
-//		}
-//		else
-//		{
-//			std::cout << "Parser: OK (DEBUG): " << std::endl;
-//			std::cout << "        Prefix.Nick: " << msg.prefix->nick << std::endl;
-//			std::cout << "        Prefix.User: " << msg.prefix->user << std::endl;
-//			std::cout << "        Prefix.Host: " << msg.prefix->host << std::endl;
-//			std::cout << "        Command.Type: " << msg.command->cmdType << std::endl;
-//			std::cout << "        Command.Letters: " << msg.command->letters << std::endl;
-//			std::cout << "        Command.Numbers: " << msg.command->numbers << std::endl;
-//			std::cout << "        Command.Params: " << msg.params->toString() << std::endl;
-//			int i = 1;
-//            for (std::vector<std::string>::const_iterator strIt = msg.params->Params.begin(); strIt != msg.params->Params.end(); ++strIt, ++i)
-//            {
-//                std::cout << "        Command.Params [#" << i << "]: " << *strIt << std::endl;
-//            }
-//		}
+		if(msg.command->cmdType == MsgCmd__UNKNOWN)
+		{
+			std::cerr << "Parser: Unknown command from client #" << fd << ". Client input :" << std::endl;
+			std::cerr << "       \"" << data.front() << "\"" << std::endl;
+			std::cout << std::endl;
+		}
+		else
+		{
+			std::cout << "Parser: OK (DEBUG): " << std::endl;
+			std::cout << "        Prefix.Nick: " << msg.prefix->nick << std::endl;
+			std::cout << "        Prefix.User: " << msg.prefix->user << std::endl;
+			std::cout << "        Prefix.Host: " << msg.prefix->host << std::endl;
+			std::cout << "        Command.Type: " << msg.command->cmdType << std::endl;
+			std::cout << "        Command.Letters: " << msg.command->letters << std::endl;
+			std::cout << "        Command.Numbers: " << msg.command->numbers << std::endl;
+			std::cout << "        Command.Params: " << msg.params->toString() << std::endl;
+			int i = 1;
+           for (std::vector<std::string>::const_iterator strIt = msg.params->Params.begin(); strIt != msg.params->Params.end(); ++strIt, ++i)
+           {
+               std::cout << "        Command.Params [#" << i << "]: " << *strIt << std::endl;
+           }
+		}
 
 		data.pop();
 	}
