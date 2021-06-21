@@ -21,6 +21,8 @@ public:
 	std::string getTopic() { return _topic; }
 	std::string getNumClients();
 	int getOperatorFd() { return _operator_fd; }
+	void setOperatorFd(int fd) {_operator_fd = fd;}
+	void delOperatorFd() {_operator_fd = 0;}
 	std::string getParticipantsNames();
 	void addParticipant(int fd);
 	bool ifExist(int fd); // проверить, состоит ли учатник в канале: 0 - нет 1 - да

@@ -18,7 +18,7 @@ Client::Client(const Client &src)
 std::string        Client::getPrefix()
 {
 	if (!_userdata.empty())
-    	return (_nick + "!" + _userdata[0] + "@" + _userdata[1]);
+    	return (_nick + "!" + _userdata[0] + "@" + "ircserv.net");
 	else 
 		return ("nick!user@host");
 }

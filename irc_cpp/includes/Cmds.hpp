@@ -49,9 +49,10 @@ public:
 	int		PARTCmd(int fd, const Message& msg);
 	int		MOTDCmd(int fd);
 	int		PRIVMSGCmd(int fd, const Message& msg);
-	int		MODECmd(int fd, const Message& msg); //TODO
-    int		WHOCmd(int fd, const Message& msg); //TODO
-    int		WHOISCmd(int fd, const Message& msg); //TODO
+    int		NOTICECmd(int fd, const Message& msg);
+	int		MODECmd(int fd, const Message& msg);
+    int		WHOCmd(int fd, const Message& msg);
+    int		WHOISCmd(int fd, const Message& msg);
 	int		KICKCmd(int fd, const Message& msg);
 	int		NAMESCmd(int fd, const Message& msg);
     int		NAMESCmd(int fd, const std::string& channelName);

@@ -212,7 +212,8 @@
 //                   message was sent with a nickname parameter and that
 //                   the a mode flag sent was not recognized.
 
-// #define         502     ERR_USERSDONTMATCH // ":Cant change mode for other users"
+#define             ERR_USERSDONTMATCH "502" // ":Cant change mode for other users"
+#define             ERR_USERSDONTMATCH_MSG ":Cant change mode for other users"
 //                 - Error sent to any user trying to view or change the
 //                   user mode for a user other than themselves.
 
@@ -244,18 +245,23 @@
 //                   Replies RPL_UNAWAY and RPL_NOWAWAY are sent when the
 //                   client removes and sets an AWAY message.
 
-// #define         311     RPL_WHOISUSER // "<nick> <user> <host> * :<real name>"
-// #define         312     RPL_WHOISSERVER // "<nick> <server> :<server info>"
-// #define         313     RPL_WHOISOPERATOR // "<nick> :is an IRC operator"
+#define             RPL_WHOISUSER "311"// "<nick> <user> <host> * :<real name>"
+#define             RPL_WHOISUSER_MSG "<nick user> <host> * :<real name>"
+#define             RPL_WHOISSERVER "312"// "<nick> <server> :IRC server"
+#define             RPL_WHOISSERVER_MSG "<nick> <server> :IRC server"
+
+//#define             RPL_WHOISOPERATOR "313"// "<nick> :is an IRC operator"
 // #define         317     RPL_WHOISIDLE
 //                         "<nick> <integer> :seconds idle"
-// #define         318     RPL_ENDOFWHOIS
+#define              RPL_ENDOFWHOIS "318"
+#define              RPL_ENDOFWHOIS_MSG "<nick> :End of /WHOIS list"
 //                         "<nick> :End of /WHOIS list"
-// #define         319     RPL_WHOISCHANNELS
+#define             RPL_WHOISCHANNELS "319"
+#define             RPL_WHOISCHANNELS_MSG "<nick> :<{[@|+]channel space}>"
 //                         "<nick> :{[@|+]<channel><space>}"
 
 //                 - Replies 311 - 313, 317 - 319 are all replies
-//                   generated in response to a WHOIS message.  Given that
+//                   generated in response to a WHOIS message.  Gi"<nick> :{[@|+]<channel><space>}"ven that
 //                   there are enough parameters present, the answering
 //                   server must either formulate a reply out of the above
 //                   numerics (if the query nick is found) or return an
@@ -335,11 +341,10 @@
 //                   The "comments" field may contain any comments about
 //                   the version or further version details.
 
-// #define         352     RPL_WHOREPLY
-//                         "<channel> <user> <host> <server> <nick>
-//                          <H|G>[*][@|+] :<hopcount> <real name>"
-// #define         315     RPL_ENDOFWHO
-//                         "<name> :End of /WHO list"
+#define             RPL_WHOREPLY "352"
+#define             RPL_WHOREPLY_MSG  "<channel user server> 127.0.0.1 <nickH> :0 <real name>"
+#define             RPL_ENDOFWHO "315"
+#define             RPL_ENDOFWHO_MSG            "<name> :End of /WHO list"
 
 //                 - The RPL_WHOREPLY and RPL_ENDOFWHO pair are used
 //                   to answer a WHO message.  The RPL_WHOREPLY is only

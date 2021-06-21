@@ -128,6 +128,10 @@ void Server::processMessage(const Message *msg, int fd, Client *client, Cmds *cm
             cmds->PRIVMSGCmd(fd, *msg);
             break;
         }
+        case MsgCmd_NOTICE : {
+            cmds->NOTICECmd(fd, *msg);
+            break;
+        }
         case MsgCmd_LIST : {
             cmds->LISTCmd(fd, *msg);
             break;
@@ -148,8 +152,20 @@ void Server::processMessage(const Message *msg, int fd, Client *client, Cmds *cm
 			cmds->NAMESCmd(fd, *msg);
             break;
 		}
+        case MsgCmd_WHO : {
+            cmds->WHOCmd(fd, *msg);
+            break;
+        }
+        case MsgCmd_WHOIS : {
+            cmds->WHOISCmd(fd, *msg);
+            break;
+        }
         case MsgCmd_MOTD : {
             cmds->MOTDCmd(fd);
+            break;
+        }
+        case MsgCmd_MODE : {
+            cmds->MODECmd(fd, *msg);
             break;
         }
         default: {
@@ -203,12 +219,9 @@ void Server::checkFds() {
 						*it,
 						_clients.at(*it)->messageBuf,
 						_clients.at(*it)->_messageBufLength);
-				// temParser(*it, _clients.at(*it)->messageBuf, _clients.at(*it)->_messageBufLength);
 				for (std::vector<Message>::const_iterator msg = msgs.begin(); msg != msgs.end(); ++msg)
 				{
                     this->processMessage(&(*msg), *it, _clients.at(*it), &cmds);
-
-
 				}
 				if(_clients.find(*it) != _clients.end())
 				    _clients.at(*it)->clearMessageBuffer();

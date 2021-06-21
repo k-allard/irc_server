@@ -434,18 +434,119 @@ int		Cmds::PRIVMSGCmd(int fd, const Message& msg)
 	return 0;
 }
 
+int		Cmds::NOTICECmd(int fd, const Message& msg)
+{
+    if(msg.params->Params.empty())
+        return 0;
+    if(msg.params->Params.size() == 1)
+        return 0;
+    Client *client = findClient(fd);
+    std::vector<std::string>::iterator it = msg.params->Params.begin();
+    if(isChannelNameCorrect(*it))
+    {
+        Channel *recip = findChannel(*it);
+        if(recip == NULL)
+            return 0;
+        if(!recip->ifExist(fd))
+            return 0;
+        recip->sendMessToAll(fd, setMsg(client->getPrefix(), "NOTICE", *it, msg.params->Params[1]));
+    }
+    else
+    {
+        Client *recip = findClientNick(*it);
+        if(recip == NULL)
+            return 0;
+        writeToBuf(recip->getFd(), setMsg(client->getPrefix(), "NOTICE", recip->getNick(), msg.params->Params[1]));
+    }
+    return 0;
+}
+
 int		Cmds::MODECmd(int fd, const Message& msg)
 {
-	return 0;
+    Client *client = findClient(fd);
+    if (msg.params->Params.empty())
+        return setReply(fd, ERR_NEEDMOREPARAMS, ERR_NEEDMOREPARAMS_MSG);
+    Channel *ch = findChannel(msg.params->Params[0]);
+    if (ch == NULL)
+        return 0;
+    if(msg.params->Params.size() == 1)
+        writeToBuf(fd, setMsg(client->getPrefix(), "MODE", msg.params->Params[0] + " +"));
+    else if(msg.params->Params.size() == 3)
+    {
+        if (!findClientNick(msg.params->Params[2]))
+            return setReply(fd, ERR_NOSUCHNICK, ERR_NOSUCHNICK_MSG, msg.params->Params[2]);
+        if (msg.params->Params[2] != client->getNick())
+            return setReply(fd, ERR_USERSDONTMATCH, ERR_USERSDONTMATCH_MSG);
+        if (!ch->ifExist(fd))
+            return setReply(fd, ERR_NOTONCHANNEL, ERR_NOTONCHANNEL_MSG, msg.params->Params[0]);
+        if (msg.params->Params[1] == "-o")
+        {
+            if (ch->getOperatorFd() != fd)
+                return setReply(fd, ERR_CHANOPRIVSNEEDED, ERR_CHANOPRIVSNEEDED_MSG, msg.params->Params[0]);
+            ch->delOperatorFd();
+            ch->sendMessToAll(0, setMsg(client->getPrefix(), "MODE", msg.params->Params[0] + " -o " + client->getNick()));
+        }
+        else if (msg.params->Params[1] == "+o")
+        {
+            if(ch->getOperatorFd() != 0)
+                return setReply(fd, ERR_CHANOPRIVSNEEDED, ERR_CHANOPRIVSNEEDED_MSG, msg.params->Params[0]);
+            ch->setOperatorFd(fd);
+            ch->sendMessToAll(0, setMsg(client->getPrefix(), "MODE", msg.params->Params[0] + " +o " + client->getNick()));
+        }
+    }
+    return 0;
 }
 
 int		Cmds::WHOCmd(int fd, const Message& msg)
 {
+    if(!msg.params->Params.empty())
+    {
+        Channel *ch = findChannel(msg.params->Params[0]);
+        if (ch != NULL)
+        {
+            std::set<int> *fds = ch->getParticipantsFds();
+            for (std::set<int>::iterator it = fds->begin(); it != fds->end(); ++it)
+            {
+                Client *client = findClient(*it);
+                if (client) {
+                    std::string isop = "H";
+                    if (client->getFd() == ch->getOperatorFd())
+                        isop = "H@";
+                    setReply(fd, RPL_WHOREPLY, RPL_WHOREPLY_MSG,\
+                    msg.params->Params[0] + " " + client->getUsername() + " " + _server.getName(),\
+                    client->getNick() + " " + isop, client->getRealname());
+                }
+            }
+        }
+        setReply(fd, RPL_ENDOFWHO, RPL_ENDOFWHO_MSG, msg.params->Params[0]);
+    }
     return 0;
 }
 
 int		Cmds::WHOISCmd(int fd, const Message& msg)
 {
+    if(!msg.params->Params.empty())
+    {
+        Client *client = findClientNick(msg.params->Params[0]);
+        if(client)
+        {
+            setReply(fd, RPL_WHOISUSER, RPL_WHOISUSER_MSG, client->getNick() + " " + client->getUsername(),\
+            _server.getName(), client->getRealname());
+            setReply(fd, RPL_WHOISSERVER, RPL_WHOISSERVER_MSG, client->getNick(), _server.getName());
+            std::string chans = "";
+            for(std::map<std::string, Channel*>::iterator it = _channels->begin(); it != _channels->end(); ++it)
+            {
+                if(it->second->ifExist(client->getFd()))
+                {
+                    if(it->second->getOperatorFd() == client->getFd())
+                        chans += "@";
+                    chans += it->first + " ";
+                }
+            }
+            setReply(fd, RPL_WHOISCHANNELS, RPL_WHOISCHANNELS_MSG, client->getNick(), chans);
+            setReply(fd, RPL_ENDOFWHOIS, RPL_ENDOFWHOIS_MSG, client->getNick());
+        }
+    }
     return 0;
 }
 
