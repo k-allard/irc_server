@@ -22,7 +22,7 @@ private:
 
 	Client          *findClientNick(const std::string& nick); // Ишет инстанс клиента по нику
     Channel         *findChannel(const std::string& name);
-	// int          checkClient(int fd); // TODO проверяет существует и зарегестрирован ли клиент (для вызова перед каждой коммандой кроме PASS NICK USER)
+    Client          *findCheckClient(int fd);
 	static int		checkNick(std::string nick); // проверка валидности ника max_len = 9, ascii 33-125 dec
     static int		isChannelNameCorrect(std::string name);
 	void            regClient(int fd);
@@ -58,6 +58,6 @@ public:
     int		NAMESCmd(int fd, const std::string& channelName);
 	int		LUSERSCmd(int fd, const Message& msg);
 	int		USERCmd(int fd, const Message& msg);
-    int		PONGCmd(int fd, const Message& msg);
+    int		PINGCmd(int fd, const Message& msg);
     int		LISTCmd(int fd, const Message& msg);
 };

@@ -117,7 +117,7 @@ void Server::processMessage(const Message *msg, int fd, Client *client, Cmds *cm
 			break;
 		}
         case MsgCmd_PING : {
-            cmds->PONGCmd(fd, *msg);
+            cmds->PINGCmd(fd, *msg);
             break;
         }
         case MsgCmd_QUIT : {

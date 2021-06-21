@@ -22,6 +22,17 @@ Client *Cmds::findClient(int fd)
 	return it->second;
 }
 
+Client          *Cmds::findCheckClient(int fd)
+{
+    Client *client = findClient(fd);
+    if(!client->isReg())
+    {
+        setReply(fd, ERR_NOTREGISTERED, ERR_NOTREGISTERED_MSG);
+        return NULL;
+    }
+    return client;
+}
+
 void            Cmds::regClient(int fd)
 {
     Client *client = findClient(fd);
@@ -30,9 +41,6 @@ void            Cmds::regClient(int fd)
     setReply(fd, RPL_YOURHOST, RPL_YOURHOST_MSG, _server.getName());
     setReply(fd, RPL_CREATED, RPL_CREATED_MSG, _server._toc);
     setReply(fd, RPL_MYINFO, RPL_MYINFO_MSG, _server.getName());
-    //setReply(fd, "251", ":There are 2 users and 0 services on 0 servers");
-    //setReply(fd, "254", "1 :channels formed");
-    //setReply(fd, "255", ":I have 2 clients and 0 servers");
     MOTDCmd(fd);
 }
 
@@ -262,8 +270,6 @@ int		Cmds::PASSCmd(int fd, const Message& msg)
 int		Cmds::USERCmd(int fd, const Message& msg)
 {
 	Client *client = findClient(fd);
-	if (client == NULL)
-		return -1;
 	if(!client->isPass())
 		return setReply(fd, ERR_NOTREGISTERED, ERR_NOTREGISTERED_MSG);
 	if(client->isReg())
@@ -278,10 +284,12 @@ int		Cmds::USERCmd(int fd, const Message& msg)
 
 int		Cmds::JOINCmd(int fd, const Message& msg)
 {
+    Client *client;
+    if ((client = findCheckClient(fd)) == NULL)
+        return 0;
 	if(msg.params->Params.empty())
 		return setReply(fd, ERR_NEEDMOREPARAMS, ERR_NEEDMOREPARAMS_MSG);
 	std::string channelName = msg.params->Params[0];
-	Client *client = findClient(fd);
     Channel *ch = findChannel(channelName);
 	if (ch != NULL)
 	{
@@ -316,7 +324,11 @@ int Cmds::isChannelNameCorrect(std::string name) {
 	return 1;
 }
 
-int		Cmds::TOPICCmd(int fd, const Message& msg) {
+int		Cmds::TOPICCmd(int fd, const Message& msg)
+{
+    Client *client;
+    if ((client = findCheckClient(fd)) == NULL)
+        return 0;
 	if(msg.params->Params.empty())
 		return setReply(fd, ERR_NEEDMOREPARAMS, ERR_NEEDMOREPARAMS_MSG);
 	std::string channelName = msg.params->Params[0];
@@ -341,8 +353,10 @@ int		Cmds::TOPICCmd(int fd, const Message& msg) {
 
 int		Cmds::QUITCmd(int fd, const Message& msg)
 {
+    Client *client;
+    if ((client = findCheckClient(fd)) == NULL)
+        return 0;
     writeToBuf(fd, "ERROR Closing Link");
-    Client *client = findClient(fd);
     std::string mess = client->getNick();
     if(!msg.params->Params.empty())
         mess = msg.params->Params[0];
@@ -360,13 +374,14 @@ int		Cmds::QUITCmd(int fd, const Message& msg)
 
 int		Cmds::QUITCmd(int fd)
 {
-    Client *client = findClient(fd);
-    for(std::map<std::string, Channel*>::iterator it = _channels->begin(); it != _channels->end(); ++it)
+    Client *client;
+    if ((client = findCheckClient(fd)) != NULL)
     {
-        if(it->second->ifExist(fd))
-        {
-            it->second->delParticipantIfExist(fd);
-            it->second->sendMessToAll(fd, setMsg(client->getPrefix(), "QUIT", client->getNick()));
+        for (std::map<std::string, Channel *>::iterator it = _channels->begin(); it != _channels->end(); ++it) {
+            if (it->second->ifExist(fd)) {
+                it->second->delParticipantIfExist(fd);
+                it->second->sendMessToAll(fd, setMsg(client->getPrefix(), "QUIT", client->getNick()));
+            }
         }
     }
     _server.disconnectClient(fd);
@@ -376,22 +391,20 @@ int		Cmds::QUITCmd(int fd)
 //PART #here
 int		Cmds::PARTCmd(int fd, const Message& msg)
 {
-	Client *client = findClient(fd);
+    Client *client;
+    if ((client = findCheckClient(fd)) == NULL)
+        return 0;
 	if(msg.params->Params.empty())
 		return setReply(fd, ERR_NEEDMOREPARAMS, ERR_NEEDMOREPARAMS_MSG);
-
 	std::string ch_name = msg.params->Params[0];
     Channel *ch = findChannel(ch_name);
     if (ch == NULL)
         return setReply(fd, ERR_NOSUCHCHANNEL, ERR_NOSUCHCHANNEL_MSG, ch_name);
-
     std::string mess = client->getNick();
     if(msg.params->Params.size() == 2)
         mess = msg.params->Params[1];
-
 	if (!ch->ifExist(fd))
 		return setReply(fd, ERR_NOTONCHANNEL, ERR_NOTONCHANNEL_MSG, ch_name);
-
     ch->sendMessToAll(0, setMsg(client->getPrefix(), "PART", ch_name, mess));
     ch->delParticipantIfExist(fd);
     if (ch->getParticipantsFds()->empty())
@@ -401,6 +414,9 @@ int		Cmds::PARTCmd(int fd, const Message& msg)
 
 int		Cmds::MOTDCmd(int fd)
 {
+    Client *client;
+    if ((client = findCheckClient(fd)) == NULL)
+        return 0;
     setReply(fd, RPL_MOTDSTART, RPL_MOTDSTART_MSG, _server.getName());
     setReply(fd, RPL_MOTD, RPL_MOTD_MSG, "Hi! Welcome to our humble IRC server!");
     setReply(fd, RPL_ENDOFMOTD, RPL_ENDOFMOTD_MSG);
@@ -409,11 +425,13 @@ int		Cmds::MOTDCmd(int fd)
 
 int		Cmds::PRIVMSGCmd(int fd, const Message& msg)
 {
+    Client *client;
+    if ((client = findCheckClient(fd)) == NULL)
+        return 0;
     if(msg.params->Params.empty())
         return setReply(fd, ERR_NORECIPIENT, ERR_NORECIPIENT_MSG, "PRIVMSG");
     if(msg.params->Params.size() == 1)
         return setReply(fd, ERR_NOTEXTTOSEND, ERR_NOTEXTTOSEND_MSG);
-    Client *client = findClient(fd);
     std::vector<std::string>::iterator it = msg.params->Params.begin();
     if(isChannelNameCorrect(*it))
     {
@@ -427,7 +445,7 @@ int		Cmds::PRIVMSGCmd(int fd, const Message& msg)
     else
     {
         Client *recip = findClientNick(*it);
-        if(recip == NULL)
+        if(recip == NULL || !recip->isReg())
             return setReply(fd, ERR_NOSUCHNICK, ERR_NOSUCHNICK_MSG, *it);
         writeToBuf(recip->getFd(), setMsg(client->getPrefix(), "PRIVMSG", recip->getNick(), msg.params->Params[1]));
     }
@@ -436,11 +454,13 @@ int		Cmds::PRIVMSGCmd(int fd, const Message& msg)
 
 int		Cmds::NOTICECmd(int fd, const Message& msg)
 {
+    Client *client;
+    if ((client = findCheckClient(fd)) == NULL)
+        return 0;
     if(msg.params->Params.empty())
         return 0;
     if(msg.params->Params.size() == 1)
         return 0;
-    Client *client = findClient(fd);
     std::vector<std::string>::iterator it = msg.params->Params.begin();
     if(isChannelNameCorrect(*it))
     {
@@ -454,7 +474,7 @@ int		Cmds::NOTICECmd(int fd, const Message& msg)
     else
     {
         Client *recip = findClientNick(*it);
-        if(recip == NULL)
+        if(recip == NULL || !recip->isReg())
             return 0;
         writeToBuf(recip->getFd(), setMsg(client->getPrefix(), "NOTICE", recip->getNick(), msg.params->Params[1]));
     }
@@ -463,7 +483,9 @@ int		Cmds::NOTICECmd(int fd, const Message& msg)
 
 int		Cmds::MODECmd(int fd, const Message& msg)
 {
-    Client *client = findClient(fd);
+    Client *client;
+    if ((client = findCheckClient(fd)) == NULL)
+        return 0;
     if (msg.params->Params.empty())
         return setReply(fd, ERR_NEEDMOREPARAMS, ERR_NEEDMOREPARAMS_MSG);
     Channel *ch = findChannel(msg.params->Params[0]);
@@ -499,6 +521,9 @@ int		Cmds::MODECmd(int fd, const Message& msg)
 
 int		Cmds::WHOCmd(int fd, const Message& msg)
 {
+    Client *client;
+    if ((client = findCheckClient(fd)) == NULL)
+        return 0;
     if(!msg.params->Params.empty())
     {
         Channel *ch = findChannel(msg.params->Params[0]);
@@ -525,26 +550,31 @@ int		Cmds::WHOCmd(int fd, const Message& msg)
 
 int		Cmds::WHOISCmd(int fd, const Message& msg)
 {
+    Client *client;
+    if ((client = findCheckClient(fd)) == NULL)
+        return 0;
     if(!msg.params->Params.empty())
     {
-        Client *client = findClientNick(msg.params->Params[0]);
-        if(client)
+        Client *who = findClientNick(msg.params->Params[0]);
+        if(who)
         {
-            setReply(fd, RPL_WHOISUSER, RPL_WHOISUSER_MSG, client->getNick() + " " + client->getUsername(),\
-            _server.getName(), client->getRealname());
-            setReply(fd, RPL_WHOISSERVER, RPL_WHOISSERVER_MSG, client->getNick(), _server.getName());
+            if(!who->isReg())
+                return setReply(fd, ERR_NOSUCHNICK, ERR_NOSUCHNICK_MSG, msg.params->Params[0]);
+            setReply(fd, RPL_WHOISUSER, RPL_WHOISUSER_MSG, who->getNick() + " " + who->getUsername(),\
+            _server.getName(), who->getRealname());
+            setReply(fd, RPL_WHOISSERVER, RPL_WHOISSERVER_MSG, who->getNick(), _server.getName());
             std::string chans = "";
             for(std::map<std::string, Channel*>::iterator it = _channels->begin(); it != _channels->end(); ++it)
             {
-                if(it->second->ifExist(client->getFd()))
+                if(it->second->ifExist(who->getFd()))
                 {
-                    if(it->second->getOperatorFd() == client->getFd())
+                    if(it->second->getOperatorFd() == who->getFd())
                         chans += "@";
                     chans += it->first + " ";
                 }
             }
-            setReply(fd, RPL_WHOISCHANNELS, RPL_WHOISCHANNELS_MSG, client->getNick(), chans);
-            setReply(fd, RPL_ENDOFWHOIS, RPL_ENDOFWHOIS_MSG, client->getNick());
+            setReply(fd, RPL_WHOISCHANNELS, RPL_WHOISCHANNELS_MSG, who->getNick(), chans);
+            setReply(fd, RPL_ENDOFWHOIS, RPL_ENDOFWHOIS_MSG, who->getNick());
         }
     }
     return 0;
@@ -552,6 +582,9 @@ int		Cmds::WHOISCmd(int fd, const Message& msg)
 
 int		Cmds::KICKCmd(int fd, const Message& msg)
 {
+    Client *client;
+    if ((client = findCheckClient(fd)) == NULL)
+        return 0;
 	if(msg.params->Params.size() < 2)
         return setReply(fd, ERR_NEEDMOREPARAMS, ERR_NEEDMOREPARAMS_MSG);
     std::string ch_name = msg.params->Params[0];
@@ -559,7 +592,7 @@ int		Cmds::KICKCmd(int fd, const Message& msg)
     if (ch == NULL)
         return setReply(fd, ERR_NOSUCHCHANNEL, ERR_NOSUCHCHANNEL_MSG, ch_name);
     Client *kick = findClientNick(msg.params->Params[1]);
-    if(kick == NULL || !ch->ifExist(kick->getFd()))
+    if(kick == NULL || !kick->isReg() || !ch->ifExist(kick->getFd()))
         setReply(fd, ERR_USERNOTINCHANNEL, ERR_USERNOTINCHANNEL_MSG, msg.params->Params[1], ch_name);
 
     std::string mess = kick->getNick();
@@ -586,6 +619,9 @@ int		Cmds::NAMESCmd(int fd, const std::string& channelName)
 
 int		Cmds::NAMESCmd(int fd, const Message& msg)
 {
+    Client *client;
+    if ((client = findCheckClient(fd)) == NULL)
+        return 0;
 	if(msg.params->Params.empty()) {
 		for (std::map<std::string, Channel *>::iterator it=_server._channels.begin(); it!=_server._channels.end(); ++it)
     		setReply(fd, RPL_NAMREPLY, RPL_NAMREPLY_MSG, it->first, it->second->getParticipantsNames());
@@ -605,31 +641,38 @@ int		Cmds::NAMESCmd(int fd, const Message& msg)
 
 int		Cmds::LUSERSCmd(int fd, const Message& msg)
 {
+    Client *client;
+    if ((client = findCheckClient(fd)) == NULL)
+        return 0;
 	const int i = _server.getNumOfUsers();
 	std::ostringstream s;
 	s << i;
 	std::string numOfUsers(s.str());
 	setReply(fd, RPL_LUSERCLIENT, RPL_LUSERCLIENT_MSG, numOfUsers, "0", "1"); 	//кол-во всех учатсников в сети
-
 	if (!_channels->empty()) {
 		std::ostringstream f;
 		f << _channels->size();
 		std::string numOfChannels(f.str());
 		setReply(fd, RPL_LUSERCHANNELS, RPL_LUSERCHANNELS_MSG, numOfChannels);                    //колво каналов, если они есть
 	}
-
 	return setReply(fd, RPL_LUSERME, RPL_LUSERME_MSG, numOfUsers, "1");						 //кол-во всех участников в сети
 }
 
-int		Cmds::PONGCmd(int fd, const Message& msg)
+int		Cmds::PINGCmd(int fd, const Message& msg)
 {
-    Client *client = findClient(fd);
-    writeToBuf(fd, setMsg(_server.getName(), "PONG", client->getNick(), msg.params->Params[0]));
-    return 0;
+    Client *client;
+    if ((client = findCheckClient(fd)) == NULL)
+        return 0;
+    if(msg.params->Params.empty())
+        return writeToBuf(fd, setMsg(_server.getName(), "PONG", client->getNick()));
+    return writeToBuf(fd, setMsg(_server.getName(), "PONG", client->getNick(), msg.params->Params[0]));
 }
 
 int		Cmds::LISTCmd(int fd, const Message& msg)
 {
+    Client *client;
+    if ((client = findCheckClient(fd)) == NULL)
+        return 0;
     if(msg.params->Params.empty())
     {
         setReply(fd, RPL_LISTSTART, RPL_LISTSTART_MSG);
