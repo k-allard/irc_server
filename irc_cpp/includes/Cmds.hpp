@@ -36,6 +36,9 @@ public:
     int		setReply(int fd, const std::string& code, std::string mess, const std::string& arg1);
     int		setReply(int fd, const std::string& code, std::string mess, const std::string& arg1, const std::string& arg2);
 	int		setReply(int fd, const std::string& code, std::string mess, const std::string& arg1, const std::string& arg2, const std::string& arg3); // создает сообщение по коду ошибки и отправляет его в writeToBuf
+    std::string		setMsg(const std::string& prefix, const std::string& cmd, const std::string& arg);
+    std::string		setMsg(const std::string& prefix, const std::string& cmd, const std::string& arg1, const std::string& arg2);
+
 	int		writeToBuf(int fd, std::string mess); //Записать сообщение в буфер клиента для отправки
 	int		NICKCmd(int fd, const Message& msg);
 	int		PASSCmd(int fd, const Message& msg);

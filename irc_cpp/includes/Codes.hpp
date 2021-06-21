@@ -112,12 +112,13 @@
 //                   nickname collision (registered of a NICK that
 //                   already exists by another server).
 
-// #define         441     ERR_USERNOTINCHANNEL // "<nick> <channel> :They aren't on that channel"
+#define              ERR_USERNOTINCHANNEL "441" // "<nick> <channel> :They aren't on that channel"
+#define              ERR_USERNOTINCHANNEL_MSG "<nick> <channel> :They aren't on that channel"
 //                 - Returned by the server to indicate that the target
 //                   user of the command is not on the given channel.
 
 #define         ERR_NOTONCHANNEL "442"
-#define ERR_NOTONCHANNEL_MSG "<channel> :You're not on that channel"
+#define         ERR_NOTONCHANNEL_MSG "<channel> :You're not on that channel"
 
 //                 - Returned by the server whenever a client tries to
 //                   perform a channel effecting command for which the
@@ -395,12 +396,12 @@
 //                   with a RPL_ENDOFINFO reply to indicate the end of the
 //                   replies.
 
-// #define         375     RPL_MOTDSTART
-//                         ":- <server> Message of the day - "
-// #define         372     RPL_MOTD
-//                         ":- <text>"
-// #define         376     RPL_ENDOFMOTD
-//                         ":End of /MOTD command"
+#define             RPL_MOTDSTART "375"
+#define             RPL_MOTDSTART_MSG ":- <server> Message of the day - "
+#define             RPL_MOTD "372"
+#define             RPL_MOTD_MSG                        ":- <text>"
+#define             RPL_ENDOFMOTD "376"
+#define             RPL_ENDOFMOTD_MSG                         ":End of /MOTD command"
 
 //                 - When responding to the MOTD message and the MOTD file
 //                   is found, the file is displayed line by line, with
