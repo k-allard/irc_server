@@ -26,8 +26,8 @@ int     Server::disconnectClient(int fd)
     close(fd);
     _clients.erase(fd);
     _clients_fd.erase(fd);
-    std::cout << "\n+++++++ Сlient gone away! ++++++++\n\n";
-    printClients();
+	std::cout << "A client disconnected" << std::endl;
+//    printClients();
     return 0;
 }
 
@@ -60,18 +60,18 @@ void Server::doSelect() {
 }
 
 //для дебага
-void Server::printClients() {
-std::cout << "Our clients: ";
-		std::map<int, Client*>::iterator it;
-		for (it = _clients.begin(); it != _clients.end(); ++it)
-		{
-    		std::cout << it->second->getFd();
-			if (it->second->getNick() != "")
-				std::cout << " Nick: " << it->second->getNick();
-			std::cout << " | ";
-		}
-		std::cout << std::endl << std::endl;
-}
+//void Server::printClients() {
+//std::cout << "Our clients: ";
+//		std::map<int, Client*>::iterator it;
+//		for (it = _clients.begin(); it != _clients.end(); ++it)
+//		{
+//    		std::cout << it->second->getFd();
+//			if (it->second->getNick() != "")
+//				std::cout << " Nick: " << it->second->getNick();
+//			std::cout << " | ";
+//		}
+//		std::cout << std::endl << std::endl;
+//}
 
 std::string Server::getNamesNotInChannels()
 {
@@ -181,8 +181,8 @@ void Server::checkFds() {
 		Client *client = new Client(new_socket, address);
 		// добавить его в список (мапу) наших клиентов, поставив фд в каестве ключа
 		_clients.insert(std::pair< int,Client* >(new_socket, client));
-		std::cout << "\n+++++++ New client joined! ++++++++\n\n";
-		printClients();
+		std::cout << "[ircserv.net] New client joined!" << std::endl;
+//		printClients();
 	}
 	for (std::set<int>::iterator it = _clients_fd.begin(); it != _clients_fd.end(); it++) {
 		if (FD_ISSET(*it, &_readset)) {
@@ -218,7 +218,7 @@ void Server::checkFds() {
 		if (FD_ISSET(*it, &_writeset)) {
 			// Посмотрим буфер этого клиента, если есть, что ему писать, то отправим это ему, буфер очистим
 			if (!_clients.at(*it)->_buf.empty()) {
-			    std::cout << "Rpl: " << _clients.at(*it)->_buf.front();
+//			    std::cout << "Rpl: " << _clients.at(*it)->_buf.front();
 				send(*it, _clients.at(*it)->_buf.front().c_str(), _clients.at(*it)->_buf.front().size(), 0);
 				_clients.at(*it)->_buf.front().erase();
 				_clients.at(*it)->_buf.pop();

@@ -30,6 +30,7 @@ void            Cmds::regClient(int fd)
     setReply(fd, RPL_YOURHOST, RPL_YOURHOST_MSG, _server.getName());
     setReply(fd, RPL_CREATED, RPL_CREATED_MSG, _server._toc);
     setReply(fd, RPL_MYINFO, RPL_MYINFO_MSG, _server.getName());
+	std::cout << "[ircserv.net] Сlient successfully registered" << std::endl;
 }
 
 int		Cmds::writeToBuf(int fd, std::string mess)
@@ -302,13 +303,11 @@ int		Cmds::JOINCmd(int fd, const Message& msg)
 
 int Cmds::isChannelNameCorrect(std::string name) {
 	if ((name.at(0) != '#') || (name.find(' ') != std::string::npos) || (name.length() > 50)) {
-		std::cout << "D E B U G: неправильно!" << std::endl;
 		return 0;
 	}
 	for (int i = 1; i < name.length(); i++) {
 		char ch = name.at(i);
 		if (ch < 48 || (ch > 57 && ch < 65) || (ch > 90 && ch < 97) || ch > 122) {
-			std::cout << "D E B U G: символ [" << ch << "] неправильный" << std::endl;
 			return 0;
 		}
 	}
