@@ -407,6 +407,8 @@ int		Cmds::PARTCmd(int fd, const Message& msg)
 		return setReply(fd, ERR_NOTONCHANNEL, ERR_NOTONCHANNEL_MSG, ch_name);
     ch->sendMessToAll(0, setMsg(client->getPrefix(), "PART", ch_name, mess));
     ch->delParticipantIfExist(fd);
+    if (fd == ch->getOperatorFd())
+        ch->delOperatorFd();
     if (ch->getParticipantsFds()->empty())
         _channels->erase(ch_name);
 	return 0;
@@ -594,16 +596,15 @@ int		Cmds::KICKCmd(int fd, const Message& msg)
     Client *kick = findClientNick(msg.params->Params[1]);
     if(kick == NULL || !kick->isReg() || !ch->ifExist(kick->getFd()))
         setReply(fd, ERR_USERNOTINCHANNEL, ERR_USERNOTINCHANNEL_MSG, msg.params->Params[1], ch_name);
-
     std::string mess = kick->getNick();
     if(msg.params->Params.size() == 3)
         mess = msg.params->Params[2];
-
 	if (ch->getOperatorFd() != fd)
 		return setReply(fd, ERR_CHANOPRIVSNEEDED, ERR_CHANOPRIVSNEEDED_MSG, ch_name);
-
 	ch->sendMessToAll(0, setMsg(findClient(fd)->getPrefix(), "KICK", ch_name + " " + kick->getNick(), mess));
 	ch->delParticipantIfExist(kick->getFd());
+	if (kick->getFd() == ch->getOperatorFd())
+	    ch->delOperatorFd();
     if (ch->getParticipantsFds()->empty())
         _channels->erase(ch_name);
 	return 0;
@@ -664,7 +665,7 @@ int		Cmds::PINGCmd(int fd, const Message& msg)
     if ((client = findCheckClient(fd)) == NULL)
         return 0;
     if(msg.params->Params.empty())
-        return writeToBuf(fd, setMsg(_server.getName(), "PONG", client->getNick()));
+        return 0;
     return writeToBuf(fd, setMsg(_server.getName(), "PONG", client->getNick(), msg.params->Params[0]));
 }
 

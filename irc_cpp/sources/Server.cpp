@@ -212,6 +212,7 @@ void Server::checkFds() {
 				cmds.QUITCmd(*it);
 				break ;
 			}
+			//std::cout <<  _buf <<std::endl;
 			_clients.at(*it)->appendMessageBuffer(_buf);
 			if(_clients.at(*it)->isMessageBufferComplete())
 			{
