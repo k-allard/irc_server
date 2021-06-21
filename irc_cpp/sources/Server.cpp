@@ -206,11 +206,11 @@ void Server::checkFds() {
 
 
 				}
-                if (_clients.count(*it))
+				if(_clients.find(*it) != _clients.end())
 				    _clients.at(*it)->clearMessageBuffer();
                 else
                 {
-                    _clients_fd.erase(*it);
+//                    _clients_fd.erase(*it);
                     break;
                 }
 			}
