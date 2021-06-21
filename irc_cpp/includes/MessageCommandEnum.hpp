@@ -216,6 +216,8 @@ enum MessageCommandEnum {
     /// @section INTERNAL
 	MsgCmd__NUMBER,
 
+    /// Empty
+    MsgCmd__EMPTY,
 
     /// @section INTERNAL
     /// Неизвестная команда

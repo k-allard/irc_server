@@ -12,7 +12,6 @@ USER natali natali natali natali
 #include "Codes.hpp"
 #include "Message.hpp"
 
-
 class Cmds
 {
 private:

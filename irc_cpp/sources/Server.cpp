@@ -96,6 +96,8 @@ std::string Server::getNamesNotInChannels()
 void Server::processMessage(const Message *msg, int fd, Client *client, Cmds *cmds) {
 
     switch (msg->command->cmdType) {
+		case MsgCmd__EMPTY :
+			break;
         case MsgCmd_NICK : {
         	cmds->NICKCmd(fd, *msg);
             break;
