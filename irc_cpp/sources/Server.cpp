@@ -118,6 +118,10 @@ void Server::processMessage(const Message *msg, int fd, Client *client, Cmds *cm
             checkPerror (cmds->USERCmd(fd, *msg), "USER err");
             break;
         }
+		case MsgCmd_TOPIC : {
+			checkPerror (cmds->TOPICCmd(fd, *msg), "TOPIC err");
+			break;
+		}
         case MsgCmd_PING : {
             checkPerror (cmds->PONGCmd(fd, *msg), "PONG err");
             break;

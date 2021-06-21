@@ -41,6 +41,7 @@ public:
 	int		PASSCmd(int fd, const Message& msg);
 	int		JOINCmd(int fd, const Message& msg);
     int		QUITCmd(int fd, const Message& msg);
+	int		TOPICCmd(int fd, const Message& msg);
 	int		QUITCmd(int fd);
 	int		PARTCmd(int fd, const Message& msg);
 	int		MOTDCmd(int fd, const Message& msg);

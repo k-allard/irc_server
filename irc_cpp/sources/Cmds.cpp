@@ -317,6 +317,29 @@ int Cmds::isChannelNameCorrect(std::string name) {
 	return 1;
 }
 
+int		Cmds::TOPICCmd(int fd, const Message& msg) {
+	if(msg.params->Params.empty())
+		return setReply(fd, ERR_NEEDMOREPARAMS, ERR_NEEDMOREPARAMS_MSG);
+	std::string channelName = msg.params->Params[0];
+	std::map<std::string, Channel *>::iterator it = _server._channels.find(channelName);
+	if (it == _server._channels.end())
+		return -1;
+	Channel *channel = it->second;
+	if (!channel->ifExist(fd)) {
+		return setReply(fd, ERR_NOTONCHANNEL, ERR_NOTONCHANNEL_MSG, channelName);
+	}
+	if(msg.params->Params.size() == 2) {
+		if (channel->getOperatorFd() != fd)
+			return setReply(fd, ERR_CHANOPRIVSNEEDED, ERR_CHANOPRIVSNEEDED_MSG, channelName);
+		channel->setTopic(msg.params->Params[1]);
+		return 0;
+	}
+	if (channel->getTopic().empty())
+		return setReply(fd, RPL_NOTOPIC, RPL_NOTOPIC_MSG, channelName);
+	return setReply(fd, RPL_TOPIC, RPL_TOPIC_MSG, channelName, channel->getTopic());
+
+}
+
 int		Cmds::QUITCmd(int fd, const Message& msg)
 {
     writeToBuf(fd, "ERROR Closing Link");
@@ -457,7 +480,7 @@ int		Cmds::NAMESCmd(int fd, const Message& msg)
 		std::string notInChannels = _server.getNamesNotInChannels();
 		if (!notInChannels.empty())
 			setReply(fd, RPL_NAMREPLY, RPL_NAMREPLY_MSG, "*", notInChannels);
-	} 
+	}
 	else {
 		// отправили ему список участников одного канала + конечное сообщение
 		std::string channelName = msg.params->Params[0];

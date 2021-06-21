@@ -297,8 +297,9 @@
 // #define         324     RPL_CHANNELMODEIS
 //                         "<channel> <mode> <mode params>"
 
-// #define         331     RPL_NOTOPIC
-//                         "<channel> :No topic is set"
+ #define              RPL_NOTOPIC "331"
+#define              RPL_NOTOPIC_MSG    "<channel> :No topic is set"
+
  #define             RPL_TOPIC "332"
 #define              RPL_TOPIC_MSG  "<channel> :<topic>"
 
@@ -334,7 +335,7 @@
 //                   the version or further version details.
 
 // #define         352     RPL_WHOREPLY
-//                         "<channel> <user> <host> <server> <nick> 
+//                         "<channel> <user> <host> <server> <nick>
 //                          <H|G>[*][@|+] :<hopcount> <real name>"
 // #define         315     RPL_ENDOFWHO
 //                         "<name> :End of /WHO list"
@@ -449,7 +450,7 @@
 //                   RPL_ENDOFUSERS.
 
 // #define         200     RPL_TRACELINK
-//                         "Link <version & debug level> <destination> 
+//                         "Link <version & debug level> <destination>
 //                          <next server>"
 // #define         201     RPL_TRACECONNECTING
 //                         "Try. <class> <server>"
@@ -462,7 +463,7 @@
 // #define         205     RPL_TRACEUSER
 //                         "User <class> <nick>"
 // #define         206     RPL_TRACESERVER
-//                         "Serv <class> <int>S <int>C <server> 
+//                         "Serv <class> <int>S <int>C <server>
 //                          <nick!user|*!*>@<host|server>"
 // #define         208     RPL_TRACENEWTYPE
 //                         "<newtype> 0 <client name>"
@@ -491,8 +492,8 @@
 //                   being displayed anyway.
 
 // #define         211     RPL_STATSLINKINFO
-//                         "<linkname> <sendq> <sent messages> 
-//                          <sent bytes> <received messages> 
+//                         "<linkname> <sendq> <sent messages>
+//                          <sent bytes> <received messages>
 //                          <received bytes> <time open>"
 // #define         212     RPL_STATSCOMMANDS
 //                         "<command> <count>"
@@ -505,7 +506,7 @@
 // #define         216     RPL_STATSKLINE
 //                         "K <host> * <username> <port> <class>"
 // #define         218     RPL_STATSYLINE
-//                         "Y <class> <ping frequency> <connect 
+//                         "Y <class> <ping frequency> <connect
 //                          frequency> <max sendq>"
 // #define        219     RPL_ENDOFSTATS
 //                         "<stats letter> :End of /STATS report"
