@@ -27,22 +27,18 @@ int     Server::disconnectClient(int fd)
     _clients.erase(fd);
     _clients_fd.erase(fd);
 	std::cout << "A client disconnected" << std::endl;
-//    printClients();
     return 0;
 }
 
 void Server::initFds() {
-
 	FD_ZERO(&_readset);
 	FD_SET(_server_fd, &_readset);
 	for (std::set<int>::iterator it = _clients_fd.begin(); it != _clients_fd.end(); it++)
 		FD_SET(*it, &_readset);
-
 	FD_ZERO(&_writeset);
 	FD_SET(_server_fd, &_writeset);
 	for (std::set<int>::iterator it = _clients_fd.begin(); it != _clients_fd.end(); it++)
 		FD_SET(*it, &_writeset);
-
 	_mx = 0;
 	if (!_clients_fd.empty())
 		_mx = std::max(_server_fd, *_clients_fd.rbegin());
@@ -52,26 +48,26 @@ void Server::initFds() {
 
 // select - Ждём события в одном из сокетов
 void Server::doSelect() {
-	int total_fds = 0; 		// total_fds - суммарное кол-во фд, сработавших в селекте
+	int total_fds = 0;
 	if ((total_fds = select(_mx + 1, &_readset, &_writeset, NULL, NULL)) == -1) {
 		std::cerr << "Error in select: " << strerror(errno) << std::endl;
 		exit(5);
 	}
 }
 
-//для дебага
-//void Server::printClients() {
-//std::cout << "Our clients: ";
-//		std::map<int, Client*>::iterator it;
-//		for (it = _clients.begin(); it != _clients.end(); ++it)
-//		{
-//    		std::cout << it->second->getFd();
-//			if (it->second->getNick() != "")
-//				std::cout << " Nick: " << it->second->getNick();
-//			std::cout << " | ";
-//		}
-//		std::cout << std::endl << std::endl;
-//}
+//for debug
+void Server::printClients() {
+std::cout << "Our clients: ";
+	std::map<int, Client*>::iterator it;
+	for (it = _clients.begin(); it != _clients.end(); ++it)
+	{
+	std::cout << it->second->getFd();
+		if (it->second->getNick() != "")
+			std::cout << " Nick: " << it->second->getNick();
+		std::cout << " | ";
+	}
+	std::cout << std::endl << std::endl;
+}
 
 std::string Server::getNamesNotInChannels()
 {

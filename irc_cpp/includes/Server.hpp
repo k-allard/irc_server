@@ -1,6 +1,6 @@
 #pragma once
+
 #include "header.hpp"
-#define OPERPASS 45673
 
 class Server
 {
@@ -20,28 +20,23 @@ private:
 public:
 	Server(int port, std::string pass);
 	~Server();
-	void	mainLoop();
-	std::map<int, Client*>	_clients;		// мапа клиентов с ключом - номером сокета и значением - ссылкой на инстанс клиента
-	std::map<std::string, Channel*> _channels; // мапа каналов с ключом - названием канала
 
-    std::string             _toc;           //время создания сервера
+	std::map<int, Client*>			_clients;
+	std::map<std::string, Channel*>	_channels;
+    std::string						_toc;
 
-	std::string getPass() {return this->_pass;};
-    std::string getName() {return this->_name;};
-	int     disconnectClient(int fd);
-	std::string getNamesNotInChannels(); //строка имен не состоящих ни в одном канале
-	int getNumOfUsers() { return _clients_fd.size(); }; //кол-во учатников всего на сервере
+	int						disconnectClient(int fd);
+	std::string				getPass() {return this->_pass;};
+    std::string				getName() {return this->_name;};
+	std::string				getNamesNotInChannels();
+	int						getNumOfUsers() { return _clients_fd.size(); };
+	void					mainLoop();
 
 private:
-	void	initServer();
-	void	initFds();
-	void	doSelect();
-	void	checkFds();
-	void    processMessage(const Message *msg, int fd, Client *client, Cmds *cmds);
-
-	//********************//
-	//  f o r _ d e b u g //
-	//********************//
-	void	printClients();
-	void	temParser(int fd, char *buf, int size);
+	void					initServer();
+	void					initFds();
+	void					doSelect();
+	void					checkFds();
+	void					processMessage(const Message *msg, int fd, Client *client, Cmds *cmds);
+	void					printClients();	//for debug
 };

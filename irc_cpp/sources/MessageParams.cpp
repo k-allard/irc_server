@@ -1,7 +1,3 @@
-//
-// Created by Anastasia on 14.06.2021.
-//
-
 #include "../includes/MessageParams.hpp"
 
 /**
@@ -27,17 +23,17 @@ MessageParams::MessageParams(std::string::iterator &it, const std::string::itera
     std::string middle = str.substr(0, str.find(trailing_delimiter));
     std::string trailing = str.substr(middle.length(), str.length());
 
-    if(middle != "")
+    if (middle != "")
     {
         std::istringstream stream(middle);
         std::string tmp;
         while (std::getline(stream, tmp, ' ')) {
-            if(tmp.empty())
+            if (tmp.empty())
                 continue;
             this->Params.push_back(tmp);
         }
     }
-    if(trailing != "")
+    if (trailing != "")
     {
         trailing.erase(0, 2);
         this->Params.push_back(trailing);
@@ -46,11 +42,10 @@ MessageParams::MessageParams(std::string::iterator &it, const std::string::itera
 
 std::string MessageParams::toString() {
 	std::string str("");
-
 	for (std::vector<std::string>::const_iterator i = this->Params.begin(); i != this->Params.end(); ++i)
 	{
 		str += *i;
-		if(i + 1 < this->Params.end())
+		if (i + 1 < this->Params.end())
 			str += " ";
 	}
 	return str;

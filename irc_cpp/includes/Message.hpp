@@ -1,7 +1,5 @@
-//
-// Created by Anastasia on 14.06.2021.
-//
 #pragma once
+
 #include "header.hpp"
 
 /**
@@ -13,7 +11,7 @@ public:
 	Message(std::string str);
 	~Message();
 
-	MessagePrefix *prefix;
-	MessageCommand *command;
-	MessageParams *params;
+	MessagePrefix*	prefix;
+	MessageCommand*	command;
+	MessageParams*	params;
 };

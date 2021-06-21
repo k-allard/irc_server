@@ -1,7 +1,5 @@
-//
-// Created by Anastasia on 14.06.2021.
-//
 #pragma once
+
 #include "header.hpp"
 
 /**
@@ -22,6 +20,6 @@
 class MessageParams {
 public:
 	MessageParams(std::string::iterator &it, const std::string::iterator &end);
-	std::vector<std::string> Params;
-	std::string toString();
+	std::vector<std::string>	Params;
+	std::string					toString();
 };

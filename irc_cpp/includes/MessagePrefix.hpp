@@ -1,7 +1,5 @@
-//
-// Created by Anastasia on 14.06.2021.
-//
 #pragma once
+
 #include "header.hpp"
 
 /**
@@ -15,5 +13,4 @@ public:
 	std::string host;
 
 	MessagePrefix(std::string::iterator &it, const std::string::iterator &end);
-
 };

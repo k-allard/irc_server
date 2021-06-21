@@ -1,7 +1,3 @@
-//
-// Created by Anastasia on 14.06.2021.
-//
-
 #include "../includes/MessagePrefix.hpp"
 
 /**
@@ -21,6 +17,7 @@
  * @param it
  * @param end
  */
+
 MessagePrefix::MessagePrefix(std::string::iterator &it, const std::string::iterator &end)
 {
 	if(it < end && *it == ':')

@@ -5,10 +5,10 @@
 class Channel
 {
 private:
-	std::set<int>			_participants_fds; // участники канала (их сокеты)
-	int						_operator_fd; // сокет оператора канала
+	std::set<int>			_participants_fds;
+	int						_operator_fd;
 	std::string				_topic;
-	Server					&_server;
+	Server&					_server;
 
 public:
 	Channel(int operator_fd, Server &server) : _operator_fd (operator_fd), _server(server) {
@@ -17,18 +17,16 @@ public:
 	};
 	~Channel() { };
 
-	void setTopic(std::string topic) { _topic = topic; }
-	std::string getTopic() { return _topic; }
-	std::string getNumClients();
-	int getOperatorFd() { return _operator_fd; }
-	void setOperatorFd(int fd) {_operator_fd = fd;}
-	void delOperatorFd() {_operator_fd = 0;}
-	std::string getParticipantsNames();
-	void addParticipant(int fd);
-	bool ifExist(int fd); // проверить, состоит ли учатник в канале: 0 - нет 1 - да
-	void delParticipantIfExist(int fd); //удалить учатника канала по фд, если такой есть
-	std::set<int> *getParticipantsFds();
-    // всем в этом канале разослать mess кроме fd (если есть)
-	void sendMessToAll(int fd, std::string mess);
-
+	void			setTopic(std::string topic) { _topic = topic; }
+	std::string		getTopic() { return _topic; }
+	std::string		getNumClients();
+	int				getOperatorFd() { return _operator_fd; }
+	void			setOperatorFd(int fd) {_operator_fd = fd;}
+	void			delOperatorFd() {_operator_fd = 0;}
+	std::string		getParticipantsNames();
+	void			addParticipant(int fd);
+	bool			ifExist(int fd);								// проверить, состоит ли участник в канале: 0 - нет 1 - да
+	void			delParticipantIfExist(int fd);					// удалить участника канала по фд, если такой есть
+	std::set<int>*	getParticipantsFds();
+	void			sendMessToAll(int fd, std::string mess);		// всем в этом канале кроме отправителя разослать mess
 };

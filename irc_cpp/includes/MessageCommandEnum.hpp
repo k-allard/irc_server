@@ -1,6 +1,3 @@
-//
-// Created by Anastasia on 14.06.2021.
-//
 #pragma once
 
 enum MessageCommandEnum {

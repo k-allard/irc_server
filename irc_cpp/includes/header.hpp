@@ -3,7 +3,7 @@
 #include <iostream>
 #include <fcntl.h>
 #include <sys/socket.h>
-#include <netinet/in.h> //для sockaddr_in
+#include <netinet/in.h> // for sockaddr_in
 #include <unistd.h>
 #include <cstdlib>      // for atoi
 #include <set>          // for std::set
@@ -15,9 +15,8 @@
 #include <sstream>
 #include <queue>
 #include <errno.h>
-//#include <array>
 
-// Для Linux
+// for Linux
 #include <cstdio>
 #include <cstring>
 
@@ -40,5 +39,3 @@ class Channel;
 #include "Client.hpp"
 #include "Server.hpp"
 #include "Channel.hpp"
-
-// std::string G_CMDS[12] = {"NICK", "PASS", "JOIN", "QUIT", "PART", "MOTD", "PRIVMSG", "MODE", "KICK", "LUSER", "USER", "USERS" };

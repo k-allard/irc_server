@@ -1,8 +1,5 @@
-//
-// Created by Anastasia on 14.06.2021.
-//
-
 #pragma once
+
 #include "header.hpp"
 
 /**
@@ -14,11 +11,10 @@ public:
 	MessageCommand(std::string::iterator &it, const std::string::iterator &end);
 	~MessageCommand();
 
-	std::string letters;
-	int numbers;
-	MessageCommandEnum cmdType;
+	std::string			letters;
+	int					numbers;
+	MessageCommandEnum	cmdType;
 private:
-	std::string getLettersOrSetNumbers(std::string::iterator &it, const std::string::iterator &end);
-	MessageCommandEnum str2enum(std::string &string);
-
+	std::string			getLettersOrSetNumbers(std::string::iterator &it, const std::string::iterator &end);
+	MessageCommandEnum	str2enum(std::string &string);
 };

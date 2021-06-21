@@ -1,9 +1,4 @@
-//
-// Created by Anastasia on 14.06.2021.
-//
-
 #include "../includes/Message.hpp"
-
 
 Message::Message(std::string str) {
 	std::string::iterator it = str.begin();
@@ -13,6 +8,4 @@ Message::Message(std::string str) {
 	this->params = new MessageParams(it, end);
 }
 
-Message::~Message() {
-
-}
+Message::~Message() { }
