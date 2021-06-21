@@ -23,7 +23,7 @@ std::vector<Message> Parser::do_parsing(int fd, char *buf, int size)
 			continue;
 		if (tmp.at(tmp.size() - 1) == '\r')
 			tmp.erase(tmp.size() - 1, 1);
-		std::cerr << "[" << tmp << "]" << std::endl;
+//		std::cerr << "[" << tmp << "]" << std::endl;
 		data.push(tmp);
 	}
 	while(!data.empty()) {
