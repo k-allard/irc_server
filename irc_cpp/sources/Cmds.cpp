@@ -15,15 +15,16 @@ Client *Cmds::findClient(int fd)
 {
 	std::map<int, Client*>::iterator it;
 	it = _clients->find(fd);
-	if (it == _clients->end())
-		return NULL;
+	if (it == _clients->end()) {
+		std::cerr << "ERROR in management client's socket\nExiting . . ." << std::endl;
+		exit(7);
+	}
 	return it->second;
 }
 
 void            Cmds::regClient(int fd)
 {
     Client *client = findClient(fd);
-
     client->registr();
     setReply(fd, RPL_WELCOME, RPL_WELCOME_MSG, client->getPrefix());
     setReply(fd, RPL_YOURHOST, RPL_YOURHOST_MSG, _server.getName());
@@ -248,10 +249,7 @@ int		Cmds::USERCmd(int fd, const Message& msg)
 {
 	Client *client = findClient(fd);
 	if (client == NULL)
-	{
-		perror("client not found");
 		return -1;
-	}
 	if(!client->isPass())
 		return setReply(fd, ERR_NOTREGISTERED, ERR_NOTREGISTERED_MSG);
 	if(client->isReg())

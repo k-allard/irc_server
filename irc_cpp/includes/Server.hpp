@@ -36,7 +36,6 @@ private:
 	void	initFds();
 	void	doSelect();
 	void	checkFds();
-    void    checkPerror(int code, const char* errorMessage);
 	void    processMessage(const Message *msg, int fd, Client *client, Cmds *cmds);
 
 	//********************//

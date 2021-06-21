@@ -14,6 +14,7 @@
 #include <string>
 #include <sstream>
 #include <queue>
+#include <errno.h>
 //#include <array>
 
 // Для Linux

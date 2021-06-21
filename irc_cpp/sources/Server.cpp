@@ -54,7 +54,7 @@ void Server::initFds() {
 void Server::doSelect() {
 	int total_fds = 0; 		// total_fds - суммарное кол-во фд, сработавших в селекте
 	if ((total_fds = select(_mx + 1, &_readset, &_writeset, NULL, NULL)) == -1) {
-		perror("select");
+		std::cerr << "Error in select: " << strerror(errno) << std::endl;
 		exit(5);
 	}
 }
@@ -71,12 +71,6 @@ std::cout << "Our clients: ";
 			std::cout << " | ";
 		}
 		std::cout << std::endl << std::endl;
-}
-
-void Server::checkPerror(int code, const char* errorMessage)
-{
-    if (code == -1)
-        perror(errorMessage);
 }
 
 std::string Server::getNamesNotInChannels()
@@ -103,51 +97,51 @@ void Server::processMessage(const Message *msg, int fd, Client *client, Cmds *cm
 
     switch (msg->command->cmdType) {
         case MsgCmd_NICK : {
-            checkPerror (cmds->NICKCmd(fd, *msg), "NICK err");
+        	cmds->NICKCmd(fd, *msg);
             break;
         }
 		case MsgCmd_JOIN : {
-			checkPerror (cmds->JOINCmd(fd, *msg), "JOIN err");
+			cmds->JOINCmd(fd, *msg);
 			break;
 		}
         case MsgCmd_PASS : {
-            checkPerror (cmds->PASSCmd(fd, *msg), "PASS err");
+            cmds->PASSCmd(fd, *msg);
             break;
         }
         case MsgCmd_USER : {
-            checkPerror (cmds->USERCmd(fd, *msg), "USER err");
+            cmds->USERCmd(fd, *msg);
             break;
         }
 		case MsgCmd_TOPIC : {
-			checkPerror (cmds->TOPICCmd(fd, *msg), "TOPIC err");
+			cmds->TOPICCmd(fd, *msg);
 			break;
 		}
         case MsgCmd_PING : {
-            checkPerror (cmds->PONGCmd(fd, *msg), "PONG err");
+            cmds->PONGCmd(fd, *msg);
             break;
         }
         case MsgCmd_QUIT : {
-            checkPerror (cmds->QUITCmd(fd, *msg), "QUIT err");
+            cmds->QUITCmd(fd, *msg);
             break;
         }
         case MsgCmd_PRIVMSG : {
-            checkPerror (cmds->PRIVMSGCmd(fd, *msg), "PRIVMSG err");
+            cmds->PRIVMSGCmd(fd, *msg);
             break;
         }
         case MsgCmd_LIST : {
-            checkPerror (cmds->LISTCmd(fd, *msg), "LIST err");
+            cmds->LISTCmd(fd, *msg);
             break;
         }
 		case MsgCmd_PART : {
-            checkPerror(cmds->PARTCmd(fd, *msg), "PART err");
+            cmds->PARTCmd(fd, *msg);
             break;
         }
 		case MsgCmd_KICK : {
-            checkPerror(cmds->KICKCmd(fd, *msg), "KICK err");
+            cmds->KICKCmd(fd, *msg);
             break;
         }
 		case MsgCmd_NAMES : {
-			checkPerror(cmds->NAMESCmd(fd, *msg), "NAMES err");
+			cmds->NAMESCmd(fd, *msg);
             break;
 		}
         default: {
@@ -173,7 +167,7 @@ void Server::checkFds() {
 		socklen_t	size		= sizeof(address);
 		// Поступил новый запрос на соединение, принимаем с помощью accept
 		if ((new_socket = accept(_server_fd, (struct sockaddr *)&address, &size)) < 0) {
-			perror("accept");
+			std::cerr << "Error in accept: " << strerror(errno) << std::endl;
 			exit(6);
 		}
 		fcntl(new_socket, F_SETFL, O_NONBLOCK);
@@ -240,7 +234,7 @@ void Server::mainLoop() {
 
 void Server::initServer() {
     if ((_server_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-		perror("socket");
+		std::cerr << "Error in socket: " << strerror(errno) << std::endl;
 		exit(2);
 	}
 	fcntl(_server_fd, F_SETFL, O_NONBLOCK);  // устанавливается неблокирующий доступ к фд
@@ -253,13 +247,13 @@ void Server::initServer() {
 
 	// bind - Связать сокет с IP-адресом и портом
 	if (bind(_server_fd,(struct sockaddr *)&_address,sizeof(_address)) < 0) {
-		perror("bind");
+		std::cerr << "Error in bind: " << strerror(errno) << std::endl;
 		exit(3);
 	}
 
 	//listen - Объявить о желании принимать соединения. Слушает порт и ждет когда будет установлено соединение
 	if (listen(_server_fd, 10) < 0) { // 10 - максимальное количество соединений, которые могут быть поставлены в очередь
-		perror("listen");
+		std::cerr << "Error in listen: " << strerror(errno) << std::endl;
 		exit(4);
 	}
 }
