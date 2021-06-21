@@ -136,6 +136,10 @@ void Server::processMessage(const Message *msg, int fd, Client *client, Cmds *cm
             cmds->PARTCmd(fd, *msg);
             break;
         }
+		case MsgCmd_LUSERS : {
+			cmds->LUSERSCmd(fd, *msg);
+			break;
+		}
 		case MsgCmd_KICK : {
             cmds->KICKCmd(fd, *msg);
             break;

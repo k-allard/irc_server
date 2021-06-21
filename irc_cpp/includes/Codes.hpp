@@ -524,18 +524,20 @@
 //                         - To answer a query about a client's own mode,
 //                           RPL_UMODEIS is sent back.
 
-// #define         251     RPL_LUSERCLIENT
-//                         ":There are <integer> users and <integer>
-//                          invisible on <integer> servers"
-// #define         252     RPL_LUSEROP
-//                         "<integer> :operator(s) online"
-// #define         253     RPL_LUSERUNKNOWN
-//                         "<integer> :unknown connection(s)"
-// #define         254     RPL_LUSERCHANNELS
-//                         "<integer> :channels formed"
-// #define         255     RPL_LUSERME
-//                         ":I have <integer> clients and <integer>
-//                           servers"
+ #define              RPL_LUSERCLIENT "251"
+#define              RPL_LUSERCLIENT_MSG           ":There are <integer> users and <integer> invisible on <integer> servers"
+
+ #define              RPL_LUSEROP "252"
+#define              RPL_LUSEROP_MSG      "<integer> :operator(s) online"
+
+ #define              RPL_LUSERUNKNOWN "253"
+#define              RPL_LUSERUNKNOWN_MSG          "<integer> :unknown connection(s)"
+
+ #define              RPL_LUSERCHANNELS "254"
+#define              RPL_LUSERCHANNELS_MSG     "<integer> :channels formed"
+
+ #define              RPL_LUSERME "255"
+#define              RPL_LUSERME_MSG  ":I have <integer> clients and <integer> servers"
 
 //                         - In processing an LUSERS message, the server
 //                           sends a set of replies from RPL_LUSERCLIENT,

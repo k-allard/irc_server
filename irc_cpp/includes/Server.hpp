@@ -30,6 +30,7 @@ public:
     std::string getName() {return this->_name;};
 	int     disconnectClient(int fd);
 	std::string getNamesNotInChannels(); //строка имен не состоящих ни в одном канале
+	int getNumOfUsers() { std::cout << "на сервере [" << _clients_fd.size() << "] юзеров" << std::endl; return _clients_fd.size(); }; //кол-во учатников всего на сервере
 
 private:
 	void	initServer();

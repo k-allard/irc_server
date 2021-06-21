@@ -209,7 +209,7 @@ enum MessageCommandEnum {
 
 	MsgCmd_MSG,
 	MsgCmd_MOTD,
-	MsgCmd_LUSER,
+	MsgCmd_LUSERS,
 
     // INTERNAL
 

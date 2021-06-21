@@ -439,7 +439,7 @@ int		Cmds::MODECmd(int fd, const Message& msg)
 }
 
 
-//   Parameters: <channel> <user>
+//   Parameters: <channel> <user> :[<message>]
 int		Cmds::KICKCmd(int fd, const Message& msg)
 {
 	if(msg.params->Params.size() < 2)
@@ -489,9 +489,34 @@ int		Cmds::NAMESCmd(int fd, const Message& msg)
 	return setReply(fd, RPL_ENDOFNAMES, RPL_ENDOFNAMES_MSG, "", "");
 }
 
-int		Cmds::LUSERCmd(int fd, const Message& msg)
+// In processing an LUSERS message, the server
+//                           sends a set of replies:
+//                           RPL_LUSERCLIENT,
+//                           RPL_LUSEROP,
+//                           RPL_USERUNKNOWN,
+//                           RPL_LUSERCHANNELS,
+//                           and RPL_LUSERME.
+//                           When replying, a server must send back
+//                           RPL_LUSERCLIENT and RPL_LUSERME.  The other
+//                           replies are only sent back if a non-zero count
+//                           is found for them.
+int		Cmds::LUSERSCmd(int fd, const Message& msg)
 {
-	return 0;
+	const int i = _server.getNumOfUsers();
+	std::ostringstream s;
+	s << i;
+	std::string numOfUsers(s.str());
+	setReply(fd, RPL_LUSERCLIENT, RPL_LUSERCLIENT_MSG, numOfUsers, "0", "1"); 	//кол-во всех учатсников в сети
+
+	int k = _server._channels.size();
+	if (k != 0) {
+		std::ostringstream f;
+		f << k;
+		std::string numOfChannels(f.str());
+		setReply(fd, RPL_LUSERCHANNELS, RPL_LUSERCHANNELS_MSG, numOfChannels);                    //колво каналов, если они есть
+	}
+
+	return setReply(fd, RPL_LUSERME, RPL_LUSERME_MSG, numOfUsers, "1");						 //кол-во всех участников в сети
 }
 
 int		Cmds::USERSCmd(int fd, const Message& msg)

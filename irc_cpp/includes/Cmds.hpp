@@ -49,7 +49,7 @@ public:
 	int		MODECmd(int fd, const Message& msg);
 	int		KICKCmd(int fd, const Message& msg);
 	int		NAMESCmd(int fd, const Message& msg);
-	int		LUSERCmd(int fd, const Message& msg);
+	int		LUSERSCmd(int fd, const Message& msg);
 	int		USERCmd(int fd, const Message& msg);
 	int		USERSCmd(int fd, const Message& msg);
     int		PONGCmd(int fd, const Message& msg);

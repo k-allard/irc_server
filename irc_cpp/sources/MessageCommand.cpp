@@ -138,7 +138,7 @@ MessageCommandEnum MessageCommand::str2enum(std::string &str)
     // OTHER
     else if(string == "MSG")        msgEnum = MsgCmd_MSG;
     else if(string == "MOTD")       msgEnum = MsgCmd_MOTD;
-    else if(string == "LUSER")      msgEnum = MsgCmd_LUSER;
+    else if(string == "LUSERS")      msgEnum = MsgCmd_LUSERS;
     else
         msgEnum = MsgCmd__UNKNOWN;
     return  msgEnum;
