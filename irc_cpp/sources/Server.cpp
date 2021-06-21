@@ -148,6 +148,10 @@ void Server::processMessage(const Message *msg, int fd, Client *client, Cmds *cm
 			cmds->NAMESCmd(fd, *msg);
             break;
 		}
+        case MsgCmd_MOTD : {
+            cmds->MOTDCmd(fd);
+            break;
+        }
         default: {
             if(client->isReg()) {
                 cmds->setReply(fd, ERR_UNKNOWNCOMMAND, ERR_UNKNOWNCOMMAND_MSG, msg->command->letters, "");

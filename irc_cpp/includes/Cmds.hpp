@@ -38,23 +38,25 @@ public:
 	int		setReply(int fd, const std::string& code, std::string mess, const std::string& arg1, const std::string& arg2, const std::string& arg3); // создает сообщение по коду ошибки и отправляет его в writeToBuf
     std::string		setMsg(const std::string& prefix, const std::string& cmd, const std::string& arg);
     std::string		setMsg(const std::string& prefix, const std::string& cmd, const std::string& arg1, const std::string& arg2);
+    int		writeToBuf(int fd, std::string mess); //Записать сообщение в буфер клиента для отправки
 
-	int		writeToBuf(int fd, std::string mess); //Записать сообщение в буфер клиента для отправки
-	int		NICKCmd(int fd, const Message& msg);
+    int		NICKCmd(int fd, const Message& msg);
 	int		PASSCmd(int fd, const Message& msg);
 	int		JOINCmd(int fd, const Message& msg);
     int		QUITCmd(int fd, const Message& msg);
 	int		TOPICCmd(int fd, const Message& msg);
 	int		QUITCmd(int fd);
 	int		PARTCmd(int fd, const Message& msg);
-	int		MOTDCmd(int fd, const Message& msg);
+	int		MOTDCmd(int fd);
 	int		PRIVMSGCmd(int fd, const Message& msg);
-	int		MODECmd(int fd, const Message& msg);
+	int		MODECmd(int fd, const Message& msg); //TODO
+    int		WHOCmd(int fd, const Message& msg); //TODO
+    int		WHOISCmd(int fd, const Message& msg); //TODO
 	int		KICKCmd(int fd, const Message& msg);
 	int		NAMESCmd(int fd, const Message& msg);
+    int		NAMESCmd(int fd, const std::string& channelName);
 	int		LUSERSCmd(int fd, const Message& msg);
 	int		USERCmd(int fd, const Message& msg);
-	int		USERSCmd(int fd, const Message& msg);
     int		PONGCmd(int fd, const Message& msg);
     int		LISTCmd(int fd, const Message& msg);
 };

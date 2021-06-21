@@ -33,9 +33,7 @@ void            Cmds::regClient(int fd)
     //setReply(fd, "251", ":There are 2 users and 0 services on 0 servers");
     //setReply(fd, "254", "1 :channels formed");
     //setReply(fd, "255", ":I have 2 clients and 0 servers");
-    setReply(fd, RPL_MOTDSTART, RPL_MOTDSTART_MSG, _server.getName());
-    setReply(fd, RPL_MOTD, RPL_MOTD_MSG, "Hi! Welcome to our humble IRC server!");
-    setReply(fd, RPL_ENDOFMOTD, RPL_ENDOFMOTD_MSG);
+    MOTDCmd(fd);
 }
 
 int		Cmds::writeToBuf(int fd, std::string mess)
@@ -278,7 +276,6 @@ int		Cmds::USERCmd(int fd, const Message& msg)
 	return 0;
 }
 
-// JOIN #here
 int		Cmds::JOINCmd(int fd, const Message& msg)
 {
 	if(msg.params->Params.empty())
@@ -286,47 +283,35 @@ int		Cmds::JOINCmd(int fd, const Message& msg)
 	std::string channelName = msg.params->Params[0];
 	Client *client = findClient(fd);
     Channel *ch = findChannel(channelName);
-	if (ch != NULL) // 	такой канал у нас есть
+	if (ch != NULL)
 	{
-		// добвить в учатников канала, если он еще не там
 		if (ch->ifExist(fd))
 			return setReply(fd, ERR_USERONCHANNEL, ERR_USERONCHANNEL_MSG, client->getNick(), channelName);
 		ch->addParticipant(fd);
-		// всем в этом канале (кроме его самого) разослать :<client prefix> JOIN <channel name>
         ch->sendMessToAll(0, setMsg(client->getPrefix(), "JOIN", channelName));
-		// отправили ему топик канала
-		if (!_server._channels[channelName]->getTopic().empty())
+		if (!ch->getTopic().empty())
 			setReply(fd, RPL_TOPIC, RPL_TOPIC_MSG, channelName, _server._channels[channelName]->getTopic());
-		// отправили ему список участников каналов + конечное сообщение TODO заменить на NAMES
-		setReply(fd, RPL_NAMREPLY, RPL_NAMREPLY_MSG, channelName, _server._channels[channelName]->getParticipantsNames());
-		setReply(fd, RPL_ENDOFNAMES, RPL_ENDOFNAMES_MSG);
+        NAMESCmd(fd, channelName);
 	}
-	else //такого канала нет надо создать и его туда добавить
+	else
 	{
 		if (!isChannelNameCorrect(channelName))
             return setReply(fd, ERR_NOSUCHCHANNEL, ERR_NOSUCHCHANNEL_MSG, channelName);
 		Channel *newChannel = new Channel(fd, _server);
-		_server._channels.insert( std::pair<std::string, Channel*>(channelName,newChannel) );
-
+		_server._channels.insert( std::pair<std::string, Channel*>(channelName,newChannel));
         writeToBuf(fd, setMsg(client->getPrefix(), "JOIN", channelName));
-        // отправили ему список участников каналов + конечное сообщение TODO заменить на NAMES
-        setReply(fd, RPL_NAMREPLY, RPL_NAMREPLY_MSG, channelName, _server._channels[channelName]->getParticipantsNames());
-        setReply(fd, RPL_ENDOFNAMES, RPL_ENDOFNAMES_MSG);
+        NAMESCmd(fd, channelName);
 	}
 	return 0;
 }
 
 int Cmds::isChannelNameCorrect(std::string name) {
-	if ((name.at(0) != '#') || (name.find(' ') != std::string::npos) || (name.length() > 50)) {
-		std::cout << "D E B U G: неправильно!" << std::endl;
+	if ((name.at(0) != '#') || (name.find(' ') != std::string::npos) || (name.length() > 50))
 		return 0;
-	}
 	for (int i = 1; i < name.length(); i++) {
 		char ch = name.at(i);
-		if (ch < 48 || (ch > 57 && ch < 65) || (ch > 90 && ch < 97) || ch > 122) {
-			std::cout << "D E B U G: символ [" << ch << "] неправильный" << std::endl;
+		if (ch < 48 || (ch > 57 && ch < 65) || (ch > 90 && ch < 97) || ch > 122)
 			return 0;
-		}
 	}
 	return 1;
 }
@@ -414,8 +399,11 @@ int		Cmds::PARTCmd(int fd, const Message& msg)
 	return 0;
 }
 
-int		Cmds::MOTDCmd(int fd, const Message& msg)
+int		Cmds::MOTDCmd(int fd)
 {
+    setReply(fd, RPL_MOTDSTART, RPL_MOTDSTART_MSG, _server.getName());
+    setReply(fd, RPL_MOTD, RPL_MOTD_MSG, "Hi! Welcome to our humble IRC server!");
+    setReply(fd, RPL_ENDOFMOTD, RPL_ENDOFMOTD_MSG);
 	return 0;
 }
 
@@ -451,8 +439,16 @@ int		Cmds::MODECmd(int fd, const Message& msg)
 	return 0;
 }
 
+int		Cmds::WHOCmd(int fd, const Message& msg)
+{
+    return 0;
+}
 
-//   Parameters: <channel> <user> :[<message>]
+int		Cmds::WHOISCmd(int fd, const Message& msg)
+{
+    return 0;
+}
+
 int		Cmds::KICKCmd(int fd, const Message& msg)
 {
 	if(msg.params->Params.size() < 2)
@@ -479,6 +475,14 @@ int		Cmds::KICKCmd(int fd, const Message& msg)
 	return 0;
 }
 
+int		Cmds::NAMESCmd(int fd, const std::string& channelName)
+{
+    Channel *ch = findChannel(channelName);
+    if(ch != NULL)
+        setReply(fd, RPL_NAMREPLY, RPL_NAMREPLY_MSG, channelName, ch->getParticipantsNames());
+    return setReply(fd, RPL_ENDOFNAMES, RPL_ENDOFNAMES_MSG);
+}
+
 int		Cmds::NAMESCmd(int fd, const Message& msg)
 {
 	if(msg.params->Params.empty()) {
@@ -491,24 +495,13 @@ int		Cmds::NAMESCmd(int fd, const Message& msg)
 	else {
 		// отправили ему список участников одного канала + конечное сообщение
 		std::string channelName = msg.params->Params[0];
-		if (_server._channels.find(channelName) == _server._channels.end())
-			return -1;
-		setReply(fd, RPL_NAMREPLY, RPL_NAMREPLY_MSG, channelName, _server._channels[channelName]->getParticipantsNames());
+		Channel *ch = findChannel(channelName);
+		if(ch != NULL)
+		    setReply(fd, RPL_NAMREPLY, RPL_NAMREPLY_MSG, channelName, _server._channels[channelName]->getParticipantsNames());
 	}
-	return setReply(fd, RPL_ENDOFNAMES, RPL_ENDOFNAMES_MSG, "", "");
+	return setReply(fd, RPL_ENDOFNAMES, RPL_ENDOFNAMES_MSG);
 }
 
-// In processing an LUSERS message, the server
-//                           sends a set of replies:
-//                           RPL_LUSERCLIENT,
-//                           RPL_LUSEROP,
-//                           RPL_USERUNKNOWN,
-//                           RPL_LUSERCHANNELS,
-//                           and RPL_LUSERME.
-//                           When replying, a server must send back
-//                           RPL_LUSERCLIENT and RPL_LUSERME.  The other
-//                           replies are only sent back if a non-zero count
-//                           is found for them.
 int		Cmds::LUSERSCmd(int fd, const Message& msg)
 {
 	const int i = _server.getNumOfUsers();
@@ -517,20 +510,14 @@ int		Cmds::LUSERSCmd(int fd, const Message& msg)
 	std::string numOfUsers(s.str());
 	setReply(fd, RPL_LUSERCLIENT, RPL_LUSERCLIENT_MSG, numOfUsers, "0", "1"); 	//кол-во всех учатсников в сети
 
-	int k = _server._channels.size();
-	if (k != 0) {
+	if (!_channels->empty()) {
 		std::ostringstream f;
-		f << k;
+		f << _channels->size();
 		std::string numOfChannels(f.str());
 		setReply(fd, RPL_LUSERCHANNELS, RPL_LUSERCHANNELS_MSG, numOfChannels);                    //колво каналов, если они есть
 	}
 
 	return setReply(fd, RPL_LUSERME, RPL_LUSERME_MSG, numOfUsers, "1");						 //кол-во всех участников в сети
-}
-
-int		Cmds::USERSCmd(int fd, const Message& msg)
-{
-	return 0;
 }
 
 int		Cmds::PONGCmd(int fd, const Message& msg)
