@@ -591,8 +591,8 @@ int Cmds::KICKCmd(int fd, const Message& msg)
         return setReply(fd, ERR_NOSUCHCHANNEL, ERR_NOSUCHCHANNEL_MSG, ch_name);
     Client *kick = findClientNick(msg.params->Params[1]);
     if (kick == NULL || !kick->isReg() || !ch->ifExist(kick->getFd()))
-        setReply(fd, ERR_USERNOTINCHANNEL, ERR_USERNOTINCHANNEL_MSG, msg.params->Params[1], ch_name);
-    std::string mess = kick->getNick();
+        return setReply(fd, ERR_USERNOTINCHANNEL, ERR_USERNOTINCHANNEL_MSG, msg.params->Params[1], ch_name);
+    std::string mess = client->getNick();
     if (msg.params->Params.size() == 3)
         mess = msg.params->Params[2];
 	if (ch->getOperatorFd() != fd)
@@ -626,7 +626,7 @@ int Cmds::NAMESCmd(int fd, const Message& msg)
 		if (!notInChannels.empty())
 			setReply(fd, RPL_NAMREPLY, RPL_NAMREPLY_MSG, "*", notInChannels);
 	}
-	else {      		// отправили ему список участников одного канала + конечное сообщение
+	else {
 		std::string channelName = msg.params->Params[0];
 		Channel *ch = findChannel(channelName);
 		if (ch != NULL)
