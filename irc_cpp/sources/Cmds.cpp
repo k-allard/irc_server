@@ -201,11 +201,9 @@ int Cmds::setReply(int fd, const std::string& code, std::string mess, const std:
 
 int Cmds::checkNick(std::string nick)
 {
-    if (isChannelNameCorrect(nick))
+    if (isChannelNameCorrect(nick) || nick.size() > 9)
         return 0;
-	if (nick.size() > 9)
-		return 0;
-    for(int i = 0; i < nick.size(); i++)
+    for(int i = 0; i < static_cast<int>(nick.size()); i++)
     {
         if (nick[i] < 33 || nick[i] > 126)
             return 0;
@@ -282,8 +280,9 @@ int		Cmds::USERCmd(int fd, const Message& msg)
 int		Cmds::JOINCmd(int fd, const Message& msg)
 {
     Client *client;
-    if ((client = findCheckClient(fd)) == NULL)
+    if ((client = findCheckClient(fd)) == NULL) {
         return 0;
+    }
 	if (msg.params->Params.empty())
 		return setReply(fd, ERR_NEEDMOREPARAMS, ERR_NEEDMOREPARAMS_MSG);
 	std::string channelName = msg.params->Params[0];
@@ -313,7 +312,7 @@ int		Cmds::JOINCmd(int fd, const Message& msg)
 int Cmds::isChannelNameCorrect(std::string name) {
 	if ((name.at(0) != '#') || (name.find(' ') != std::string::npos) || (name.length() > 50))
 		return 0;
-	for (int i = 1; i < name.length(); i++) {
+	for (int i = 1; i < static_cast<int>(name.length()); i++) {
 		char ch = name.at(i);
 		if (ch < 48 || (ch > 57 && ch < 65) || (ch > 90 && ch < 97) || ch > 122)
 			return 0;
@@ -324,8 +323,9 @@ int Cmds::isChannelNameCorrect(std::string name) {
 int Cmds::TOPICCmd(int fd, const Message& msg)
 {
     Client *client;
-    if ((client = findCheckClient(fd)) == NULL)
+    if ((client = findCheckClient(fd)) == NULL) {
         return 0;
+    }
 	if (msg.params->Params.empty())
 		return setReply(fd, ERR_NEEDMOREPARAMS, ERR_NEEDMOREPARAMS_MSG);
 	std::string channelName = msg.params->Params[0];
@@ -388,8 +388,9 @@ int Cmds::QUITCmd(int fd)
 int Cmds::PARTCmd(int fd, const Message& msg)
 {
     Client *client;
-    if ((client = findCheckClient(fd)) == NULL)
+    if ((client = findCheckClient(fd)) == NULL) {
         return 0;
+    }
 	if (msg.params->Params.empty())
 		return setReply(fd, ERR_NEEDMOREPARAMS, ERR_NEEDMOREPARAMS_MSG);
 	std::string ch_name = msg.params->Params[0];
@@ -397,16 +398,18 @@ int Cmds::PARTCmd(int fd, const Message& msg)
     if (ch == NULL)
         return setReply(fd, ERR_NOSUCHCHANNEL, ERR_NOSUCHCHANNEL_MSG, ch_name);
     std::string mess = client->getNick();
-    if (msg.params->Params.size() == 2)
+    if (msg.params->Params.size() == 2) {
         mess = msg.params->Params[1];
+    }
 	if (!ch->ifExist(fd))
 		return setReply(fd, ERR_NOTONCHANNEL, ERR_NOTONCHANNEL_MSG, ch_name);
     ch->sendMessToAll(0, setMsg(client->getPrefix(), "PART", ch_name, mess));
     ch->delParticipantIfExist(fd);
     if (fd == ch->getOperatorFd())
         ch->delOperatorFd();
-    if (ch->getParticipantsFds()->empty())
+    if (ch->getParticipantsFds()->empty()) {
         _channels->erase(ch_name);
+    }
 	return 0;
 }
 
@@ -581,8 +584,9 @@ int Cmds::WHOISCmd(int fd, const Message& msg)
 int Cmds::KICKCmd(int fd, const Message& msg)
 {
     Client *client;
-    if ((client = findCheckClient(fd)) == NULL)
+    if ((client = findCheckClient(fd)) == NULL) {
         return 0;
+    }
 	if (msg.params->Params.size() < 2)
         return setReply(fd, ERR_NEEDMOREPARAMS, ERR_NEEDMOREPARAMS_MSG);
     std::string ch_name = msg.params->Params[0];
@@ -593,16 +597,18 @@ int Cmds::KICKCmd(int fd, const Message& msg)
     if (kick == NULL || !kick->isReg() || !ch->ifExist(kick->getFd()))
         return setReply(fd, ERR_USERNOTINCHANNEL, ERR_USERNOTINCHANNEL_MSG, msg.params->Params[1], ch_name);
     std::string mess = client->getNick();
-    if (msg.params->Params.size() == 3)
+    if (msg.params->Params.size() == 3) {
         mess = msg.params->Params[2];
+    }
 	if (ch->getOperatorFd() != fd)
 		return setReply(fd, ERR_CHANOPRIVSNEEDED, ERR_CHANOPRIVSNEEDED_MSG, ch_name);
 	ch->sendMessToAll(0, setMsg(findClient(fd)->getPrefix(), "KICK", ch_name + " " + kick->getNick(), mess));
 	ch->delParticipantIfExist(kick->getFd());
 	if (kick->getFd() == ch->getOperatorFd())
 	    ch->delOperatorFd();
-    if (ch->getParticipantsFds()->empty())
+    if (ch->getParticipantsFds()->empty()) {
         _channels->erase(ch_name);
+    }
 	return 0;
 }
 
@@ -617,8 +623,9 @@ int Cmds::NAMESCmd(int fd, const std::string& channelName)
 int Cmds::NAMESCmd(int fd, const Message& msg)
 {
     Client *client;
-    if ((client = findCheckClient(fd)) == NULL)
+    if ((client = findCheckClient(fd)) == NULL) {
         return 0;
+    }
 	if (msg.params->Params.empty()) {
 		for (std::map<std::string, Channel *>::iterator it=_server._channels.begin(); it!=_server._channels.end(); ++it)
     		setReply(fd, RPL_NAMREPLY, RPL_NAMREPLY_MSG, it->first, it->second->getParticipantsNames());
@@ -637,9 +644,13 @@ int Cmds::NAMESCmd(int fd, const Message& msg)
 
 int Cmds::LUSERSCmd(int fd, const Message& msg)
 {
+	if (!msg.params->Params.empty()) {
+		return -1;
+	}
     Client *client;
-    if ((client = findCheckClient(fd)) == NULL)
+    if ((client = findCheckClient(fd)) == NULL) {
         return 0;
+    }
 	const int i = _server.getNumOfUsers();
 	std::ostringstream s;
 	s << i;

@@ -11,14 +11,14 @@ HEADER = header.hpp
 
 INCLUDES= -I ./includes
 
-FLAGS2 =-Wall -Wextra -Werror
-FLAGS =-g -fsanitize=address -std=c++98
+FLAGS2 =-g -fsanitize=address
+FLAGS =-std=c++98 -Wall -Wextra -Werror
 
 all: $(NAME)
 
 $(NAME): $(OBJS)
 	@echo "\x1b[33mPreparing ircserv.net. . .\x1b[0m"
-	@$(CC) -o $(NAME) $(OBJS) $(FLAGS) $(INCLUDES)
+	$(CC) -o $(NAME) $(OBJS) $(FLAGS) $(INCLUDES)
 	@echo "\x1b[32mircserv.net is ready!\x1b[0m"
 	@echo "Usage: ./ircserv <port> <password>"
 

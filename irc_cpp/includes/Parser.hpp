@@ -11,5 +11,5 @@ public:
 	Parser(Server &server);
 	~Parser();
 
-	std::vector<Message>	do_parsing(int fd, char *buf, int size);
+	std::vector<Message>	do_parsing(char *buf);
 };

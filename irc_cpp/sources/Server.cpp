@@ -172,8 +172,6 @@ void Server::processMessage(const Message *msg, int fd, Client *client, Cmds *cm
 }
 
 void Server::checkFds() {
-	int					bytes_read		= 0;
-	int					new_socket		= 0;
 	struct sockaddr_in	address;
     Cmds				cmds(*this);
 
@@ -187,24 +185,21 @@ void Server::checkFds() {
 		}
 		fcntl(new_socket, F_SETFL, O_NONBLOCK);
 		_clients_fd.insert(new_socket);
-		Client *client = new Client(new_socket, address);
+		Client *client = new Client(new_socket);
 		_clients.insert(std::pair< int,Client* >(new_socket, client));
 		std::cout << "[ircserv.net] New client joined!" << std::endl;
 	}
 	for (std::set<int>::iterator it = _clients_fd.begin(); it != _clients_fd.end(); it++) {
 		int temp_fd = *it;
 		if (FD_ISSET(*it, &_readset)) {
-			if ((bytes_read = recv(*it, _buf, 512, 0)) <= 0) {
+			if (recv(*it, _buf, 512, 0) <= 0) {
 				cmds.QUITCmd(*it);
 				break ;
 			}
 			_clients.at(*it)->appendMessageBuffer(_buf);
 			if (_clients.at(*it)->isMessageBufferComplete())
 			{
-				std::vector<Message> msgs = _parser->do_parsing(
-						*it,
-						_clients.at(*it)->messageBuf,
-						_clients.at(*it)->_messageBufLength);
+				std::vector<Message> msgs = _parser->do_parsing(_clients.at(*it)->messageBuf);
 				for (std::vector<Message>::const_iterator msg = msgs.begin(); msg != msgs.end(); ++msg)
 				{
                     this->processMessage(&(*msg), *it, _clients.at(*it), &cmds);
