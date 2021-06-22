@@ -13,4 +13,5 @@ public:
 	std::string host;
 
 	MessagePrefix(std::string::iterator &it, const std::string::iterator &end);
+    ~MessagePrefix();
 };

@@ -29,3 +29,8 @@ MessagePrefix::MessagePrefix(std::string::iterator &it, const std::string::itera
 		this->host = "";
 	}
 }
+
+MessagePrefix::~MessagePrefix()
+{
+
+}

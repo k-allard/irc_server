@@ -40,6 +40,11 @@ MessageParams::MessageParams(std::string::iterator &it, const std::string::itera
     }
 }
 
+MessageParams::~MessageParams()
+{
+    Params.clear();
+}
+
 std::string MessageParams::toString() {
 	std::string str("");
 	for (std::vector<std::string>::const_iterator i = this->Params.begin(); i != this->Params.end(); ++i)

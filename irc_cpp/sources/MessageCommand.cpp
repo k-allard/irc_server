@@ -26,6 +26,7 @@ MessageCommand::~MessageCommand() { }
  */
 std::string MessageCommand::getLettersOrSetNumbers(std::string::iterator &it, const std::string::iterator &end)
 {
+    this->cmdType = MsgCmd__UNKNOWN;
 	std::string str = "";
 	if (it < end)
 	{

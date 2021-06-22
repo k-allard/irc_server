@@ -186,11 +186,11 @@ void Server::checkFds() {
 			_clients.at(*it)->appendMessageBuffer(_buf);
 			if (_clients.at(*it)->isMessageBufferComplete())
 			{
-				std::vector<Message> msgs = _parser->do_parsing(_clients.at(*it)->messageBuf);
-				for (std::vector<Message>::const_iterator msg = msgs.begin(); msg != msgs.end(); ++msg)
-				{
-                    this->processMessage(&(*msg), *it, _clients.at(*it), &cmds);
-				}
+				std::vector<Message*> msgs = _parser->do_parsing(_clients.at(*it)->messageBuf);
+				for (std::vector<Message*>::const_iterator msg = msgs.begin(); msg != msgs.end(); ++msg) {
+                    this->processMessage(*msg, *it, _clients.at(*it), &cmds);
+                    delete *msg;
+                }
 				if (_clients.find(temp_fd) != _clients.end())
 				    _clients.at(temp_fd)->clearMessageBuffer();
                 else

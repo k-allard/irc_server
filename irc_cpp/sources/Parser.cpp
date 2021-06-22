@@ -2,11 +2,13 @@
 
 Parser::Parser(Server &server) : _server(server) { }
 
-Parser::~Parser() { }
+Parser::~Parser() {
 
-std::vector<Message> Parser::do_parsing(char *buf)
+}
+
+std::vector<Message*> Parser::do_parsing(char *buf)
 {
-	std::vector<Message> result;
+	std::vector<Message*> result;
 	Cmds cmds(this->_server);
 	std::string com(buf);
 	std::istringstream stream(com);
@@ -20,7 +22,7 @@ std::vector<Message> Parser::do_parsing(char *buf)
 		data.push(tmp);
 	}
 	while(!data.empty()) {
-		Message msg = Message(data.front());
+		Message *msg = new Message(data.front());
 		result.push_back(msg);
 		data.pop();
 	}

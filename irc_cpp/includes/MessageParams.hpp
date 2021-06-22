@@ -20,6 +20,7 @@
 class MessageParams {
 public:
 	MessageParams(std::string::iterator &it, const std::string::iterator &end);
+	~MessageParams();
 	std::vector<std::string>	Params;
 	std::string					toString();
 };

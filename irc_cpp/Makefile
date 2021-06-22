@@ -18,12 +18,12 @@ all: $(NAME)
 
 $(NAME): $(OBJS)
 	@echo "Preparing ircserv.net. . ."
-	$(CC) -o $(NAME) $(OBJS) $(FLAGS) $(INCLUDES)
+	$(CC) -o $(NAME) $(OBJS) $(FLAGS) $(FLAGS2) $(INCLUDES)
 	@echo "ircserv.net is ready!"
 	@echo "Usage: ./ircserv <port> <password>"
 
 %.o: %.cpp
-	@$(CC) $(FLAGS) $(INCLUDES) -c $^ -o $@
+	@$(CC) $(FLAGS) $(FLAGS2) $(INCLUDES) -c $^ -o $@
 
 clean:
 	@rm -rf $(OBJS)
