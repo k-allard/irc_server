@@ -7,6 +7,7 @@ class Parser
 {
 private:
 	Server&					_server;
+	Parser();
 public:
 	Parser(Server &server);
 	~Parser();

@@ -9,6 +9,7 @@ private:
 	int						_operator_fd;
 	std::string				_topic;
 	Server&					_server;
+	Channel();
 
 public:
 	Channel(int operator_fd, Server &server) : _operator_fd (operator_fd), _server(server) {

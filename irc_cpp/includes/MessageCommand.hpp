@@ -17,4 +17,5 @@ public:
 private:
 	std::string			getLettersOrSetNumbers(std::string::iterator &it, const std::string::iterator &end);
 	MessageCommandEnum	str2enum(std::string &string);
+	MessageCommand();
 };

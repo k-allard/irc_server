@@ -9,6 +9,7 @@ private:
 	std::vector<std::string>    _userdata; //0 = username, 1 = host, 2 = server, 3 = real name
 	bool                        _ispass;
 	bool				        _isreg;
+	Client();
 
 public:
 	Client(int fd);

@@ -18,6 +18,7 @@ private:
     static int		isChannelNameCorrect(std::string name);
 	void            regClient(int fd);
     Client          *findClient(int fd);
+	Cmds();
 
 public:
 	Cmds(Server &server);

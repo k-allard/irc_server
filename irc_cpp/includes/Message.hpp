@@ -14,4 +14,6 @@ public:
 	MessagePrefix*	prefix;
 	MessageCommand*	command;
 	MessageParams*	params;
+private:
+	Message();
 };
