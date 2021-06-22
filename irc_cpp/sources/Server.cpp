@@ -26,7 +26,7 @@ int     Server::disconnectClient(int fd)
     close(fd);
     _clients.erase(fd);
     _clients_fd.erase(fd);
-	std::cout << "A client disconnected" << std::endl;
+	std::cout << "[ircserv.net] A client disconnected" << std::endl;
     return 0;
 }
 
