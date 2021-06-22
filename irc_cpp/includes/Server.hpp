@@ -39,5 +39,4 @@ private:
 	void					doSelect();
 	void					checkFds();
 	void					processMessage(const Message *msg, int fd, Client *client, Cmds *cmds);
-	void					printClients();	//for debug
 };

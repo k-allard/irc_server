@@ -24,6 +24,7 @@ Server::~Server() {
 int     Server::disconnectClient(int fd)
 {
     close(fd);
+    delete _clients[fd];
     _clients.erase(fd);
     _clients_fd.erase(fd);
 	std::cout << "[ircserv.net] A client disconnected" << std::endl;
@@ -48,23 +49,9 @@ void Server::initFds() {
 void Server::doSelect() {
 	int total_fds = 0;
 	if ((total_fds = select(_mx + 1, &_readset, &_writeset, NULL, NULL)) == -1) {
-		std::cerr << "Error in select: " << strerror(errno) << std::endl;
+		std::cerr << "Error in select" << std::endl;
 		exit(5);
 	}
-}
-
-//for debug
-void Server::printClients() {
-std::cout << "Our clients: ";
-	std::map<int, Client*>::iterator it;
-	for (it = _clients.begin(); it != _clients.end(); ++it)
-	{
-	std::cout << it->second->getFd();
-		if (it->second->getNick() != "")
-			std::cout << " Nick: " << it->second->getNick();
-		std::cout << " | ";
-	}
-	std::cout << std::endl << std::endl;
 }
 
 std::string Server::getNamesNotInChannels()
@@ -180,7 +167,7 @@ void Server::checkFds() {
 		int			new_socket	= 0;
 		socklen_t	size		= sizeof(address);
 		if ((new_socket = accept(_server_fd, (struct sockaddr *)&address, &size)) < 0) {
-			std::cerr << "Error in accept: " << strerror(errno) << std::endl;
+			std::cerr << "Error in accept" << std::endl;
 			exit(6);
 		}
 		fcntl(new_socket, F_SETFL, O_NONBLOCK);
@@ -231,7 +218,7 @@ void Server::mainLoop() {
 
 void Server::initServer() {
     if ((_server_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-		std::cerr << "Error in socket: " << strerror(errno) << std::endl;
+		std::cerr << "Error in socket" << std::endl;
 		exit(2);
 	}
 	fcntl(_server_fd, F_SETFL, O_NONBLOCK);
@@ -241,12 +228,12 @@ void Server::initServer() {
 	_address.sin_port = htons(_port);
 
 	if (bind(_server_fd,(struct sockaddr *)&_address,sizeof(_address)) < 0) {
-		std::cerr << "Error in bind: " << strerror(errno) << std::endl;
+		std::cerr << "Error in bind" << std::endl;
 		exit(3);
 	}
 
 	if (listen(_server_fd, 10) < 0) {
-		std::cerr << "Error in listen: " << strerror(errno) << std::endl;
+		std::cerr << "Error in listen" << std::endl;
 		exit(4);
 	}
 }

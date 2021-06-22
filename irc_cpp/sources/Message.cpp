@@ -8,4 +8,8 @@ Message::Message(std::string str) {
 	this->params = new MessageParams(it, end);
 }
 
-Message::~Message() { }
+Message::~Message() {
+    delete this->prefix;
+    delete this->command;
+    delete this->params;
+}
