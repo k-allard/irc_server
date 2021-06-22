@@ -5,14 +5,13 @@ class Client
 {
 private:
 	int					        _fd;
-	struct sockaddr_in	        _address;
 	std::string			        _nick;
 	std::vector<std::string>    _userdata; //0 = username, 1 = host, 2 = server, 3 = real name
 	bool                        _ispass;
 	bool				        _isreg;
 
 public:
-	Client(int fd, struct sockaddr_in address);
+	Client(int fd);
 	Client(const Client& src);
 	Client& operator=(const Client& src);
 	~Client() { }

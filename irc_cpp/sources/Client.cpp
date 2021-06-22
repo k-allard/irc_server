@@ -1,6 +1,6 @@
 #include "../includes/Client.hpp"
 
-Client::Client(int fd, struct sockaddr_in address) : _fd(fd), _address(address) {
+Client::Client(int fd) : _fd(fd) {
 	this->_nick = "";
 	this->_isreg = false;
 	this->_ispass = false;

@@ -4,7 +4,7 @@ Parser::Parser(Server &server) : _server(server) { }
 
 Parser::~Parser() { }
 
-std::vector<Message> Parser::do_parsing(int fd, char *buf, int size)
+std::vector<Message> Parser::do_parsing(char *buf)
 {
 	std::vector<Message> result;
 	Cmds cmds(this->_server);

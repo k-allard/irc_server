@@ -15,7 +15,6 @@
 #define ERR_NOSUCHNICK				"401"
 #define ERR_NOSUCHNICK_MSG			"<nickname> :No such nick/channel"
 
-
 #define ERR_NOSUCHCHANNEL			"403"
 #define ERR_NOSUCHCHANNEL_MSG		"<channel name> :No such channel"
 
@@ -37,7 +36,6 @@
 
 #define ERR_ERRONEUSNICKNAME		"432"
 #define ERR_ERRONEUSNICKNAME_MSG	"<nick> :Erroneus nickname"
-
 
 #define ERR_NICKNAMEINUSE			"433"
 #define ERR_NICKNAMEINUSE_MSG		"<nick> :Nickname is already in use"

@@ -1,22 +1,30 @@
 NAME = ircserv
 
-SRCS = sources/*.cpp
+SRCS =	sources/Channel.cpp \
+		sources/Client.cpp \
+		sources/Cmds.cpp \
+		sources/main.cpp \
+		sources/Message.cpp \
+		sources/MessageCommand.cpp \
+		sources/MessageParams.cpp \
+		sources/MessagePrefix.cpp \
+		sources/Parser.cpp \
+		sources/Server.cpp
 
-OBJS = $(SRCS:.cpp=.o)
+OBJS =	$(SRCS:.cpp=.o)
 
-HEADER = header.hpp
+HEADER =	header.hpp
 
-FLAGS2 =-Wall -Wextra -Werror
-FLAGS =-g -fsanitize=address -std=c++98
+FLAGS2 =-g -fsanitize=address
+FLAGS =-std=c++98 -Wall -Wextra -Werror
 
 all: $(NAME)
 
 $(NAME):
 	@echo "\x1b[33mPreparing ircserv.net. . .\x1b[0m"
-	@clang++ -o $(NAME) $(SRCS) $(FLAGS)
+	clang++ -o $(NAME) $(SRCS) $(FLAGS)
 	@echo "\x1b[32mircserv.net is ready!\x1b[0m"
 	@echo "Usage: ./ircserv <port> <password>"
-
 
 clean:
 	@rm -rf $(OBJS)

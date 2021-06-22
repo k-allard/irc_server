@@ -205,7 +205,7 @@ int Cmds::checkNick(std::string nick)
         return 0;
 	if (nick.size() > 9)
 		return 0;
-    for(int i = 0; i < nick.size(); i++)
+    for(int i = 0; i < static_cast<int>(nick.size()); i++)
     {
         if (nick[i] < 33 || nick[i] > 126)
             return 0;
@@ -313,7 +313,7 @@ int		Cmds::JOINCmd(int fd, const Message& msg)
 int Cmds::isChannelNameCorrect(std::string name) {
 	if ((name.at(0) != '#') || (name.find(' ') != std::string::npos) || (name.length() > 50))
 		return 0;
-	for (int i = 1; i < name.length(); i++) {
+	for (int i = 1; i < static_cast<int>(name.length()); i++) {
 		char ch = name.at(i);
 		if (ch < 48 || (ch > 57 && ch < 65) || (ch > 90 && ch < 97) || ch > 122)
 			return 0;
@@ -637,6 +637,9 @@ int Cmds::NAMESCmd(int fd, const Message& msg)
 
 int Cmds::LUSERSCmd(int fd, const Message& msg)
 {
+	if (!msg.params->Params.empty()) {
+		return -1;
+	}
     Client *client;
     if ((client = findCheckClient(fd)) == NULL)
         return 0;
